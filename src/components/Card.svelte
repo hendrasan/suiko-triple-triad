@@ -128,7 +128,8 @@
   .p0 .owner { color: var(--p0); }
   .p1 .owner { color: var(--p1); }
 
-  .runeslot { position: absolute; top: 5%; right: 5%; line-height: 0; }
+  .runeslot { position: absolute; top: 3%; right: 3%; line-height: 0; padding: 1.5cqw; border-radius: 50%; background: rgb(0 0 0 / 0.5); }
+  .runeslot :global(svg) { width: 18cqw; height: 18cqw; filter: drop-shadow(0 0.04em 0.1em rgb(0 0 0 / 0.9)) drop-shadow(0 0 1px #000); }
 
   /* Triple Triad layout: a small diamond of values in the top-left corner. */
   .vals {
@@ -136,7 +137,7 @@
     display: grid;
     grid-template-columns: repeat(3, 0.66em);
     grid-template-rows: repeat(3, 0.74em);
-    font-size: 26cqw;
+    font-size: 19cqw;
     padding: 0.08em 0.1em 0.14em;
     border-radius: 0.3em;
     background: radial-gradient(closest-side, rgb(0 0 0 / 0.35), transparent);
@@ -164,7 +165,7 @@
     text-shadow: 0 0 6px var(--gold), 0 0 2px #000;
   }
   .boost {
-    position: absolute; top: 22%; right: 5%;
+    position: absolute; top: 27%; right: 5%;
     font-size: 11cqw; font-weight: 800; color: #2a1d0b;
     background: var(--gold-2); border-radius: 6px; padding: 0 4px;
   }

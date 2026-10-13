@@ -16,6 +16,7 @@
   import { go } from '../stores/nav.svelte';
   import { activeDeck, addCard, ownedSet, persist, save } from '../stores/save.svelte';
   import { newSeed } from '../core/rng';
+  import Avatar from './Avatar.svelte';
   import Board from './Board.svelte';
   import Card from './Card.svelte';
   import RuleChips from './RuleChips.svelte';
@@ -291,6 +292,7 @@
 <div class="duel s{mode}">
   <header class="bar">
     <button class="btn small" onclick={() => go({ name: 'map' })} aria-label="Leave duel">✕</button>
+    <Avatar file={opp.portrait} size={40} boss={opp.boss} />
     <div class="who">
       <strong>{opp.name}</strong>
       <span class="muted small">{opp.title}{opp.format === 'bo2' ? ` · Game ${gameNo + 1} of 2` : ''}</span>

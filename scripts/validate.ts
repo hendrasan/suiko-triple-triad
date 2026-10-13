@@ -1,9 +1,20 @@
 // npm run validate — prints the balance and reachability report. Exits 1 on any error.
+import { existsSync } from 'node:fs';
 import { CONFIG } from '../src/core/config';
+import { OPPONENTS } from '../src/data/opponents';
+import { PORTRAIT_FILE } from '../src/data/portraits';
 import { CARDS } from '../src/data/cards';
 import { checkBudgets, checkIntegrity, checkReachability, routeCounts } from '../src/data/validate';
 
 const errs = [...checkIntegrity(), ...checkBudgets(), ...checkReachability()];
+
+// Portrait files (warnings only: a missing file shows the placeholder).
+const pic = (f: string) => existsSync(`public/portraits/${f}.webp`);
+const noArt = [
+  ...CARDS.filter((c) => !c.art && !pic(PORTRAIT_FILE[c.id] ?? c.id)).map((c) => c.id),
+  ...OPPONENTS.filter((o) => o.portrait && !pic(o.portrait)).map((o) => `opponent ${o.id}`),
+];
+console.log(noArt.length ? `Missing portraits (${noArt.length}): ${noArt.join(', ')}` : 'Portraits: all present.');
 
 console.log('Stat budgets by rarity:');
 for (const [rarity, b] of Object.entries(CONFIG.budgets)) {

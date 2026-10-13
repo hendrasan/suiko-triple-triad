@@ -30,7 +30,7 @@ export const OPPONENTS: OpponentDef[] = [
     tiles: { 3: [[0, 'fire'], [8, 'water']], 4: [[0, 'fire'], [15, 'water'], [6, 'fire']] }, faction: 'neutral',
   },
   {
-    id: 'rowd', name: 'Captain Rowd', title: 'Unicorn Brigade', region: 'toto', boss: true,
+    id: 'rowd', portrait: 'rowd', name: 'Captain Rowd', title: 'Unicorn Brigade', region: 'toto', boss: true,
     intro: 'The man who sold out the Unicorn Brigade. Uses the Same rule.',
     deck: ['hanna', 'tsai', 'zamza', 'rikimaru', 'gilbert', 'anita', 'templeton', 'tuta'],
     rules: rules({ same: true }), format: 'bo2', prize: 'choose', difficulty: 'normal', personality: 'aggressive',
@@ -53,7 +53,7 @@ export const OPPONENTS: OpponentDef[] = [
     tiles: { 3: [[3, 'water'], [5, 'water']], 4: [[4, 'water'], [7, 'water'], [8, 'water'], [11, 'water']] }, faction: 'neutral',
   },
   {
-    id: 'jowy-muse', name: 'Jowy Atreides', title: 'Muse City Hall', region: 'muse', boss: true,
+    id: 'jowy-muse', portrait: 'jowy_boss', name: 'Jowy Atreides', title: 'Muse City Hall', region: 'muse', boss: true,
     intro: 'Your best friend. Tonight, he plays for Highland.',
     deck: ['flik', 'viktor', 'eilie', 'rina', 'bolgan', 'freed', 'anita', 'hanna'],
     rules: rules({ same: true, plus: true }), format: 'bo2', prize: 'choose', difficulty: 'normal', personality: 'bond',
@@ -76,7 +76,7 @@ export const OPPONENTS: OpponentDef[] = [
     tiles: { 3: [[4, 'earth'], [0, 'wind']], 4: [[5, 'earth'], [6, 'earth'], [9, 'earth'], [10, 'earth']] }, faction: 'city-states',
   },
   {
-    id: 'solon', name: 'Solon Jhee', title: 'Highland General', region: 'two-river', boss: true,
+    id: 'solon', portrait: 'solon_jhee', name: 'Solon Jhee', title: 'Highland General', region: 'two-river', boss: true,
     intro: 'A Highland general who burns what he cannot take. Fire tiles everywhere.',
     deck: ['luc', 'shu', 'stallion', 'tengaar', 'jeane', 'hai-yo', 'huan', 'leona'],
     rules: rules({ plus: true, combo: true }), format: 'bo2', prize: 'choose', difficulty: 'hard', personality: 'rune',
@@ -99,7 +99,7 @@ export const OPPONENTS: OpponentDef[] = [
     tiles: { 3: [[3, 'wind'], [5, 'wind']], 4: [[4, 'wind'], [7, 'wind'], [9, 'earth']] }, faction: 'neutral',
   },
   {
-    id: 'gorudo', name: 'Gorudo', title: 'Lord of Matilda', region: 'rockaxe', boss: true,
+    id: 'gorudo', portrait: 'gorudo', name: 'Gorudo', title: 'Lord of Matilda', region: 'rockaxe', boss: true,
     intro: 'Cruel, vain, and very good at cards. Same, Plus, and Combo.',
     deck: ['kiba', 'klaus', 'camus', 'miklotov', 'viki', 'sheena', 'lorelai', 'gordon'],
     rules: rules({ same: true, plus: true, combo: true }), format: 'bo2', prize: 'choose', difficulty: 'hard', personality: 'aggressive',
@@ -122,7 +122,7 @@ export const OPPONENTS: OpponentDef[] = [
     tiles: { 3: [[0, 'wind'], [8, 'lightning']], 4: [[0, 'wind'], [3, 'lightning'], [12, 'lightning'], [15, 'wind']] }, faction: 'neutral',
   },
   {
-    id: 'neclord', name: 'Neclord', title: 'Lord of the Undead', region: 'tinto', boss: true,
+    id: 'neclord', portrait: 'neclord', name: 'Neclord', title: 'Lord of the Undead', region: 'tinto', boss: true,
     intro: 'The vampire returns. His chains of Combo never end.',
     deck: ['sierra', 'hauser', 'jess', 'georg', 'gantetsu', 'pico', 'alberto', 'kahn'],
     rules: ALL_RULES, format: 'bo2', prize: 'highest', difficulty: 'hard', personality: 'aggressive',
@@ -137,14 +137,14 @@ export const OPPONENTS: OpponentDef[] = [
     tiles: { 3: [[4, 'fire'], [1, 'fire']], 4: [[5, 'fire'], [6, 'fire'], [1, 'fire'], [2, 'earth']] }, faction: 'highland',
   },
   {
-    id: 'seed-culgan', name: 'Seed & Culgan', title: 'Highland Generals', region: 'luca-court', general: true,
+    id: 'seed-culgan', portrait: 'seed', name: 'Seed & Culgan', title: 'Highland Generals', region: 'luca-court', general: true,
     intro: 'Two generals, one plan. They love formations.',
     deck: ['valeria', 'stallion', 'georg', 'meg', 'gadget', 'jude', 'hoi', 'karen'],
     rules: ALL_RULES, format: 'single', prize: 'choose', difficulty: 'hard', personality: 'bond',
     tiles: { 3: [[3, 'fire'], [5, 'earth']], 4: [[4, 'fire'], [7, 'earth'], [8, 'earth'], [11, 'fire']] }, faction: 'highland',
   },
   {
-    id: 'luca', name: 'Luca Blight', title: 'Prince of Highland', region: 'luca-court', boss: true,
+    id: 'luca', portrait: 'luca_blight', name: 'Luca Blight', title: 'Prince of Highland', region: 'luca-court', boss: true,
     intro: 'The mad prince. Every rule. No mercy. Best of two.',
     deck: ['kiba', 'klaus', 'pesmerga', 'georg', 'sierra', 'luc', 'viktor', 'flik'],
     rules: ALL_RULES, format: 'bo2', prize: 'choose', difficulty: 'boss', personality: 'aggressive',

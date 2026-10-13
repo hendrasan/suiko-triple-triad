@@ -34,6 +34,8 @@ export interface OpponentDef {
   faction?: 'highland' | 'city-states' | 'neutral';
   general?: boolean;
   boss?: boolean;
+  /** File name in public/portraits (no extension). */
+  portrait?: string;
 }
 
 // ---------- Recruiting ----------

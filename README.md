@@ -16,11 +16,9 @@ npm run check      # svelte-check (types)
 npm run build      # static site in dist/
 ```
 
-## Add portrait art
+## Portrait art
 
-Put image files in `src/assets/portraits/`. Use the card id as the file name, for example `flik.png` or `luca.webp`. Accepted types: png, jpg, jpeg, webp, avif. The build finds the files automatically. A card without art shows the placeholder (initials and a shape).
-
-Card ids are in `src/data/cards.ts` (third column). A square image of 512×512 or larger looks best.
+Card and opponent art is in `public/portraits/<file>.webp`. The default file name is the card id (third column in `src/data/cards.ts`). When a file name is different (for example `riou` for `hero`), add it to `src/data/portraits.ts`. Opponent art is set with `portrait` in `src/data/opponents.ts`. A missing file shows the placeholder. `npm run validate` lists missing files.
 
 ## Structure
 

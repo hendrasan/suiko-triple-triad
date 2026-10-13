@@ -1,32 +1,25 @@
-<script lang="ts" module>
-  // Drop art into src/assets/portraits/<card-id>.(png|jpg|jpeg|webp|avif). It is picked up at build time.
-  const files = import.meta.glob('../assets/portraits/*.{png,jpg,jpeg,webp,avif}', {
-    eager: true, query: '?url', import: 'default',
-  }) as Record<string, string>;
-  const ART: Record<string, string> = {};
-  for (const [path, url] of Object.entries(files)) {
-    const id = path.split('/').pop()!.replace(/\.[^.]+$/, '');
-    ART[id] = url;
-  }
-  export function artFor(id: string, override?: string): string | undefined {
-    return override ?? ART[id];
-  }
-</script>
-
 <script lang="ts">
   import type { CardDef } from '../core/types';
+  import { cardPortrait } from '../data/portraits';
 
   let { card }: { card: CardDef } = $props();
 
-  const url = $derived(artFor(card.id, card.art));
+  const url = $derived(cardPortrait(card.id, card.art));
+  // Falls back to the placeholder when the file is missing.
+  let failed = $state(false);
+  $effect(() => {
+    void url;
+    failed = false;
+  });
   const initials = $derived(
     card.name.replace(/[^A-Za-z ]/g, ' ').split(' ').filter(Boolean).map((w) => w[0]).join('').slice(0, 2).toUpperCase(),
   );
   const heavenly = $derived(card.rarity !== 'common');
 </script>
 
-{#if url}
-  <img class="art" src={url} alt="" loading="lazy" draggable="false" />
+{#if !failed}
+  <img class="art" src={url} alt="" loading="lazy" draggable="false" onerror={() => (failed = true)} />
+  <div class="shade" aria-hidden="true"></div>
 {:else}
   <div class="ph {card.rune}" aria-hidden="true">
     <svg viewBox="0 0 100 100" class="shape">
@@ -41,7 +34,14 @@
 {/if}
 
 <style>
-  .art { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .art { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; display: block; background: #fff; }
+  /* Darkens the edges so the white values stay readable on light art. */
+  .shade {
+    position: absolute; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse 70% 62% at 50% 50%, transparent 45%, rgb(0 0 0 / 0.55) 100%),
+      linear-gradient(0deg, rgb(0 0 0 / 0.35), transparent 30%, transparent 70%, rgb(0 0 0 / 0.35));
+  }
   .ph {
     position: relative; width: 100%; height: 100%;
     display: grid; place-items: center;

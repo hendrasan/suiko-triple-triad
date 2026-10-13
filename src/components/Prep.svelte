@@ -7,6 +7,7 @@
   import { OPPONENT_BY_ID } from '../data/opponents';
   import { go } from '../stores/nav.svelte';
   import { activeDeck, deckCost, deckProblem, save } from '../stores/save.svelte';
+  import Avatar from './Avatar.svelte';
   import Board from './Board.svelte';
   import Card from './Card.svelte';
   import RuleChips from './RuleChips.svelte';
@@ -25,11 +26,14 @@
 <div class="stack">
   <button class="btn small back" onclick={() => go({ name: 'map' })}>← World</button>
   <div class="panel stack">
-    <div>
-      <h1>{opp.name}</h1>
-      <p class="muted">{opp.title}</p>
-      <p>{opp.intro}</p>
+    <div class="row head">
+      <Avatar file={opp.portrait} size={72} boss={opp.boss} />
+      <div>
+        <h1>{opp.name}</h1>
+        <p class="muted">{opp.title}</p>
+      </div>
     </div>
+    <p>{opp.intro}</p>
     <RuleChips rules={opp.rules} showOff />
     <p class="small muted">
       {opp.format === 'bo2' ? 'Best of two. The first player switches in game 2. Total cards decide a 1–1 tie.' : 'Single game. The side with the parity disadvantage boosts one card by +1.'}
@@ -63,6 +67,8 @@
 <style>
   .back { align-self: flex-start; }
   h1 { margin: 0; }
+  .head p { margin: 0; }
+  .head { flex-wrap: nowrap; gap: 14px; }
   .mode .btn { flex: 1; }
   .board-prev { max-width: 240px; }
   .deck { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; max-width: 420px; }

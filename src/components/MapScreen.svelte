@@ -3,6 +3,7 @@
   import { OPPONENTS, REGIONS } from '../data/opponents';
   import { go } from '../stores/nav.svelte';
   import { save } from '../stores/save.svelte';
+  import Avatar from './Avatar.svelte';
   import RuleChips from './RuleChips.svelte';
 
   const DIFF = { easy: '★', normal: '★★', hard: '★★★', boss: '★★★★' };
@@ -37,6 +38,7 @@
             <li>
               <button class="opp" class:boss={o.boss} onclick={() => go({ name: 'prep', opponent: o.id })}>
                 <div class="name">
+                  <Avatar file={o.portrait} size={36} boss={o.boss} />
                   <strong>{o.name}</strong>
                   {#if o.boss}<span class="tag">Boss · Bo2</span>{/if}
                   <span class="diff" aria-label="Difficulty {o.difficulty}">{DIFF[o.difficulty]}</span>

@@ -41,10 +41,9 @@ export function recruitsFromMatch(owned: Set<string>, s: MatchSummary): Recruit[
     if (!owned.has(id) && !out.some((r) => r.id === id)) out.push({ id, via });
   };
   for (const g of STORY_GATES) if (g.boss === opp.id) add(g.card, 'story');
-  for (const q of QUESTS) {
-    if (q.mode && q.mode !== s.mode) continue;
-    if (q.conds.every((c) => condMet(c, s, opp))) add(q.card, 'quest');
-  }
+  // At most one quest recruit per match, so Stars arrive one at a time.
+  const quest = QUESTS.find((q) => !owned.has(q.card) && (!q.mode || q.mode === s.mode) && q.conds.every((c) => condMet(c, s, opp)));
+  if (quest) add(quest.card, 'quest');
   return out;
 }
 

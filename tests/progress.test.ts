@@ -48,12 +48,17 @@ describe('recruiting', () => {
     expect(r).toContainEqual({ id: 'zamza', via: 'quest' });
   });
 
+  it('gives at most one quest recruit per match', () => {
+    const r = recruitsFromMatch(new Set(STARTERS), summary({ deck: ['nanami'], second: true, plus: true, flipsMax: 4 }));
+    expect(r.filter((x) => x.via === 'quest')).toHaveLength(1);
+  });
+
   it('gives nothing on a loss', () => {
     expect(recruitsFromMatch(new Set(STARTERS), summary({ won: false, deck: ['nanami'] }))).toEqual([]);
   });
 
   it('respects mode tags', () => {
-    const r3 = recruitsFromMatch(new Set(STARTERS), summary({ mode: 3, score: 12 }));
+    const r3 = recruitsFromMatch(new Set(STARTERS), summary({ mode: 3, score: 7 }));
     const r4 = recruitsFromMatch(new Set(STARTERS), summary({ mode: 4, score: 12 }));
     expect(r3.some((r) => r.id === 'amada')).toBe(true); // 3x3 needs 7
     expect(r4.some((r) => r.id === 'amada')).toBe(true); // 4x4 needs 12

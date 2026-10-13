@@ -264,3 +264,14 @@ describe('end of game', () => {
     expect(score(s)).toEqual([8, 8]);
   });
 });
+
+describe('bond reporting', () => {
+  it('reports the pair bond, not a formation that also contains both cards', () => {
+    const bonds: BondDef[] = [
+      { id: 'pair', name: 'Pair', members: ['a', 'b'] },
+      { id: 'trio', name: 'Trio', members: ['a', 'b', 'c'], shape: 'line' },
+    ];
+    const s = setup({ rules: { bonds: true }, bonds, board: { 3: [card(flat(1), 'a'), 0] }, hand0: [card(flat(1), 'b')] });
+    expect(applyMove(s, { hand: 0, cell: 4 }, bonds).bonds).toEqual(['pair']);
+  });
+});

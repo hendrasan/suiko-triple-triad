@@ -146,7 +146,10 @@ export function activeBondPairs(s: GameState, side: Side): number {
 
 function bondIdsFor(s: GameState, bonds: BondDef[] | undefined, a: string, b: string): string[] {
   if (!bonds) return [];
-  return bonds.filter((x) => x.members.includes(a) && x.members.includes(b)).map((x) => x.id);
+  const both = bonds.filter((x) => x.members.includes(a) && x.members.includes(b));
+  // Prefer the pair bond. A formation only counts here when no pair covers these two cards.
+  const pairs = both.filter((x) => !x.shape);
+  return (pairs.length ? pairs : both).map((x) => x.id);
 }
 
 // ---------- Formations ----------
@@ -207,7 +210,7 @@ function uniteTargets(s: GameState, side: Side, cells: number[]): number[] {
       best.set(n, Math.min(best.get(n) ?? 99, v));
     }
   }
-  const total = (n: number) => DIRS.reduce((a, d) => a + sideValue(s, n, d), 0);
+  const total = (n: number) => DIRS.reduce((a: number, d) => a + sideValue(s, n, d), 0);
   return [...best.keys()].sort((a, b) => best.get(a)! - best.get(b)! || total(a) - total(b) || a - b);
 }
 

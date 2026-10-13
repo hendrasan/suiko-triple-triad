@@ -69,9 +69,11 @@
           <span class="owner" aria-hidden="true">{owner === 0 ? '●' : '◆'}</span>
         {/if}
         <span class="runeslot"><RuneIcon rune={def.rune} size={14} /></span>
-        {#each shown as v, d}
-          <span class="v {POS[d]}" class:up={delta(d) > 0} class:down={delta(d) < 0} aria-hidden="true">{fmt(v)}</span>
-        {/each}
+        <div class="vals" aria-hidden="true">
+          {#each shown as v, d}
+            <span class="v {POS[d]}" class:up={delta(d) > 0} class:down={delta(d) < 0}>{fmt(v)}</span>
+          {/each}
+        </div>
         {#if bond}<span class="bond" title="Bond active" aria-hidden="true">⛓</span>{/if}
         {#if boost}<span class="boost" aria-hidden="true">+{boost}</span>{/if}
       {/if}
@@ -122,38 +124,46 @@
       repeating-linear-gradient(135deg, rgb(0 0 0 / 0.0) 0 6px, rgb(0 0 0 / 0.18) 6px 9px),
       linear-gradient(0deg, color-mix(in srgb, var(--p1) 60%, transparent), transparent 70%);
   }
-  .owner { position: absolute; top: 3%; left: 6%; font-size: 13cqw; line-height: 1; }
+  .owner { position: absolute; bottom: 4%; right: 6%; font-size: 13cqw; line-height: 1; text-shadow: 0 0 3px #000; }
   .p0 .owner { color: var(--p0); }
   .p1 .owner { color: var(--p1); }
 
-  .runeslot { position: absolute; top: 4%; right: 5%; line-height: 0; }
+  .runeslot { position: absolute; top: 5%; right: 5%; line-height: 0; }
 
+  /* Triple Triad layout: a small diamond of values in the top-left corner. */
+  .vals {
+    position: absolute; top: 2%; left: 2%;
+    display: grid;
+    grid-template-columns: repeat(3, 0.62em);
+    grid-template-rows: repeat(3, 0.78em);
+    font-size: 19cqw;
+    padding: 0.08em 0.1em 0.14em;
+    border-radius: 0.3em;
+    background: radial-gradient(closest-side, rgb(0 0 0 / 0.5), transparent);
+  }
   .v {
-    position: absolute;
     font-weight: 800;
-    font-size: 21cqw;
     line-height: 1;
-    min-width: 1.1em;
     text-align: center;
     color: #fff;
-    text-shadow: 0 0 3px #000, 0 1px 2px #000, 0 0 1px #000;
+    text-shadow: 0 0 2px #000, 0 1px 2px #000, 0 0 1px #000, 1px 0 1px #000, -1px 0 1px #000;
     font-variant-numeric: tabular-nums;
   }
-  .v.top { top: 3%; left: 50%; transform: translateX(-50%); }
-  .v.bottom { bottom: 3%; left: 50%; transform: translateX(-50%); }
-  .v.left { left: 4%; top: 50%; transform: translateY(-50%); }
-  .v.right { right: 4%; top: 50%; transform: translateY(-50%); }
+  .v.top { grid-area: 1 / 2; }
+  .v.left { grid-area: 2 / 1; }
+  .v.right { grid-area: 2 / 3; }
+  .v.bottom { grid-area: 3 / 2; }
   .v.up { color: #a6f3a9; }
   .v.down { color: #ff9c8a; }
 
   .bond {
-    position: absolute; bottom: 20%; right: 8%;
-    font-size: 14cqw; color: var(--gold-2);
+    position: absolute; bottom: 4%; left: 6%;
+    font-size: 13cqw; color: var(--gold-2);
     text-shadow: 0 0 6px var(--gold), 0 0 2px #000;
   }
   .boost {
-    position: absolute; bottom: 20%; left: 8%;
-    font-size: 12cqw; font-weight: 800; color: #2a1d0b;
+    position: absolute; top: 22%; right: 5%;
+    font-size: 11cqw; font-weight: 800; color: #2a1d0b;
     background: var(--gold-2); border-radius: 6px; padding: 0 4px;
   }
 

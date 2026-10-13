@@ -19,7 +19,6 @@
 
 {#if !failed}
   <img class="art" src={url} alt="" loading="lazy" draggable="false" onerror={() => (failed = true)} />
-  <div class="shade" aria-hidden="true"></div>
 {:else}
   <div class="ph {card.rune}" aria-hidden="true">
     <svg viewBox="0 0 100 100" class="shape">
@@ -34,14 +33,8 @@
 {/if}
 
 <style>
-  .art { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; display: block; background: #fff; }
+  .art { width: 100%; height: 100%; object-fit: cover; object-position: 50% 20%; display: block; background: #fff; }
   /* Darkens the edges so the white values stay readable on light art. */
-  .shade {
-    position: absolute; inset: 0; pointer-events: none;
-    background:
-      radial-gradient(ellipse 70% 62% at 50% 50%, transparent 45%, rgb(0 0 0 / 0.55) 100%),
-      linear-gradient(0deg, rgb(0 0 0 / 0.35), transparent 30%, transparent 70%, rgb(0 0 0 / 0.35));
-  }
   .ph {
     position: relative; width: 100%; height: 100%;
     display: grid; place-items: center;

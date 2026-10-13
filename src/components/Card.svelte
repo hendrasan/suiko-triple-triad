@@ -134,19 +134,21 @@
   .vals {
     position: absolute; top: 2%; left: 2%;
     display: grid;
-    grid-template-columns: repeat(3, 0.62em);
-    grid-template-rows: repeat(3, 0.78em);
-    font-size: 19cqw;
+    grid-template-columns: repeat(3, 0.66em);
+    grid-template-rows: repeat(3, 0.74em);
+    font-size: 26cqw;
     padding: 0.08em 0.1em 0.14em;
     border-radius: 0.3em;
-    background: radial-gradient(closest-side, rgb(0 0 0 / 0.5), transparent);
+    background: radial-gradient(closest-side, rgb(0 0 0 / 0.35), transparent);
   }
   .v {
     font-weight: 800;
     line-height: 1;
     text-align: center;
     color: #fff;
-    text-shadow: 0 0 2px #000, 0 1px 2px #000, 0 0 1px #000, 1px 0 1px #000, -1px 0 1px #000;
+    -webkit-text-stroke: 0.04em #000;
+    paint-order: stroke fill;
+    text-shadow: 0 0.06em 0.12em rgb(0 0 0 / 0.9), 0 0 0.25em rgb(0 0 0 / 0.6);
     font-variant-numeric: tabular-nums;
   }
   .v.top { grid-area: 1 / 2; }

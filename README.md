@@ -40,7 +40,8 @@ Card and opponent art is in `public/portraits/<file>.webp`. The default file nam
 - **Rune tiles**: matching rune +1 on all sides, other rune −1. Values stay in 1–10.
 - **Bonds**: a card that touches an allied bond partner gets +1 on **all** sides (one bonus at most). See assumption 1.
 - **Unite Attack**: when a formation (3–4 bonded cards in the bond's shape) is complete, the owner flips the adjacent enemy card with the lowest touching value. Once per duel per side. No chain.
-- **Parity**: casual duels give +1 to one card of the side at the disadvantage (3×3: second player, 4×4: first player). Bosses play best of two; the first player switches; total cards break a 1–1 tie.
+- **Sound**: ZzFX sound effects, generated in the browser (no audio files). On by default; toggle with 🔊 in a duel or in Settings.
+- **Parity**: casual 4×4 duels give +1 to one card of the first player (the second player gets the last move). Casual 3×3 duels have no handicap. Bosses play best of two; the first player switches; total cards break a 1–1 tie.
 - Hands are hidden. The AI sees face-down stand-ins (5/5/5/5) for your cards.
 
 ## Progression
@@ -52,7 +53,7 @@ Card and opponent art is in `public/portraits/<file>.webp`. The default file nam
 ## Assumptions (please check)
 
 1. **Bond bonus.** The brief says "the touching edges each get +1". Allied cards never fight each other, so that bonus would have no effect. This build gives +1 to all sides of a card while it touches an allied partner.
-2. **Parity handicap.** The coin flip decides the first player. The side at the disadvantage gets the +1 boost (not always the flip loser).
+2. **Parity handicap.** The coin flip decides the first player. Casual 3×3 duels have no handicap: the first player gets the last placement, but the second player keeps one card that counts and cannot be flipped. Casual 4×4 duels give the first player a +1 boost, because the second player gets the last move. Set this with `handicapSide` in `config.ts`.
 3. **Unite Attack** flips the enemy card with the lowest touching value (ties: lowest total, then board order).
 4. **"Win without losing a card"** means the opponent never flipped any of your cards in the match.
 5. **Losing a duel costs no cards.** Only the winner claims a prize.

@@ -33,8 +33,8 @@ export interface GameSetup {
 export function setupGame(opp: OpponentDef, mode: BoardSize, playerDeck: string[], seed: number, gameNo: number, prevFirst?: Side): GameSetup {
   const rng = makeRng(seed + 7919 * (gameNo + 1));
   const first: Side = gameNo === 0 || prevFirst === undefined ? (rng() < 0.5 ? 0 : 1) : ((1 - prevFirst) as Side);
-  // 3x3: going second is the disadvantage. 4x4: going first is (the second player gets the last move).
-  const handicap: Side | null = opp.format === 'single' ? (mode === 3 ? ((1 - first) as Side) : first) : null;
+  const who = opp.format === 'single' ? CONFIG.handicapSide[mode] : null;
+  const handicap: Side | null = who === 'first' ? first : who === 'second' ? ((1 - first) as Side) : null;
   return { first, hands: [toHand(playerDeck, 0), toHand(opponentDeck(opp, mode, seed), 1)], handicap };
 }
 

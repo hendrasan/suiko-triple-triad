@@ -4,7 +4,7 @@ import type { BoardSize } from '../core/types';
 import { CARD_BY_ID } from '../data/cards';
 import { STARTERS } from '../data/recruits';
 
-export const SAVE_VERSION = 1;
+export const SAVE_VERSION = 2;
 export const SLOTS = 3;
 
 export interface Settings {
@@ -62,7 +62,7 @@ export function newSave(): SaveData {
     beaten: {},
     stats: { duels: 0, wins: 0 },
     tutorialDone: false,
-    settings: { skipAnimations: false, sound: false, reducedMotion: 'auto' },
+    settings: { skipAnimations: false, sound: true, reducedMotion: 'auto' },
     lastDuel: null,
   };
 }
@@ -70,7 +70,8 @@ export function newSave(): SaveData {
 /** migrations[n] upgrades a version-n save to version n+1. Add one per format change. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const MIGRATIONS: Record<number, (s: any) => any> = {
-  // Example for the future: 1: (s) => ({ ...s, version: 2, newField: [] }),
+  // v2: sound effects are on by default. Turn them on once for older saves.
+  1: (s) => ({ ...s, version: 2, settings: { ...s.settings, sound: true } }),
 };
 
 /** Parse, upgrade, and repair a save. Throws on data that is not a save. */

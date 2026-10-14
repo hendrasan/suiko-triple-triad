@@ -23,10 +23,10 @@ describe('match setup', () => {
     expect(g2.first).toBe(1 - g1.first);
   });
 
-  it('gives the casual handicap to the second player on 3x3 and the first on 4x4', () => {
+  it('gives no casual handicap on 3x3 and gives it to the first player on 4x4', () => {
     const o = OPPONENT_BY_ID.shepherd;
     const a = setupGame(o, 3, STARTERS.slice(0, 5), 5, 0);
-    expect(a.handicap).toBe(1 - a.first);
+    expect(a.handicap).toBeNull();
     const b = setupGame(o, 4, STARTERS.slice(0, 8), 5, 0);
     expect(b.handicap).toBe(b.first);
     expect(setupGame(OPPONENT_BY_ID.rowd, 3, STARTERS.slice(0, 5), 5, 0).handicap).toBeNull();
@@ -90,6 +90,14 @@ describe('save data', () => {
     expect(fixed.owned).toEqual(['hero']);
     expect(fixed.decks[3]).toEqual([['hero'], [], []]);
     expect(fixed.version).toBe(SAVE_VERSION);
+  });
+
+  it('migrates a version 1 save and turns sound on', () => {
+    const v1 = { ...newSave(), version: 1, settings: { skipAnimations: true, sound: false, reducedMotion: 'auto' } };
+    const m = migrate(v1);
+    expect(m.version).toBe(SAVE_VERSION);
+    expect(m.settings.sound).toBe(true);
+    expect(m.settings.skipAnimations).toBe(true);
   });
 
   it('rejects newer versions and non-saves', () => {

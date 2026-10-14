@@ -11,6 +11,11 @@ export const CONFIG = {
   noComboOnLast: false,
   /** Bonus that the side with the parity handicap gives to one card in casual duels. */
   handicapBonus: 1,
+  /** Which side gets the handicap in casual duels, per board size.
+   *  3x3: none. The first player gets the last placement, but the second player keeps one card that
+   *  counts and cannot be flipped, so the two cancel out.
+   *  4x4: the first player. Nobody keeps a card, and the second player gets the last move. */
+  handicapSide: { 3: null, 4: 'first' } as Record<BoardSize, 'first' | 'second' | null>,
   /** Bonus to each side of a card that touches an allied bond partner. Max one bonus per card. */
   bondBonus: 1,
   runeMatch: 1,

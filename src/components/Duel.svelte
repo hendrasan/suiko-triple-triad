@@ -13,7 +13,7 @@
   import { CARD_BY_ID } from '../data/cards';
   import { OPPONENT_BY_ID } from '../data/opponents';
   import { sfx, wait } from '../lib/fx';
-  import { go } from '../stores/nav.svelte';
+  import { go, type Screen } from '../stores/nav.svelte';
   import { activeDeck, addCard, ownedSet, persist, save } from '../stores/save.svelte';
   import { newSeed } from '../core/rng';
   import Avatar from './Avatar.svelte';
@@ -122,7 +122,7 @@
       if (!alive) return;
       if (special && !fast) {
         banner = special.cause === 'unite' && r.unite ? `Unite Attack · ${bondName(r.unite)}` : LABEL[special.cause];
-        sfx('special');
+        sfx(special.cause === 'basic' ? 'flip' : special.cause, step);
       }
       const h = { ...hidden };
       const k = { ...flipKeys };
@@ -133,7 +133,7 @@
       hidden = h;
       if (!fast) {
         flipKeys = k;
-        sfx('flip');
+        if (!special) sfx(step > 1 ? 'combo' : 'flip', step);
       }
       if (special && !fast) {
         await wait(600);
@@ -191,7 +191,7 @@
     }
     persist();
     phase = 'result';
-    sfx(s.won ? 'win' : 'lose');
+    sfx(s.won ? 'win' : s.draw ? 'draw' : 'lose');
   }
 
   function claim(id: string) {
@@ -200,6 +200,15 @@
     prizeDone = true;
     addBondRecruits();
     persist();
+  }
+
+  /** Leave the result screen. An unclaimed prize goes to the strongest card, so the player is never stuck. */
+  function leave(to: Screen) {
+    if (!prizeDone && prizeChoices.length) {
+      const sum = (id: string) => CARD_BY_ID[id].values.reduce((a, v) => a + v, 0);
+      claim(prizeChoices.reduce((a, b) => (sum(b) > sum(a) ? b : a)));
+    }
+    go(to);
   }
 
   function addBondRecruits() {
@@ -231,6 +240,7 @@
   }
 
   function onkey(e: KeyboardEvent) {
+    if (phase === 'result' && e.key === 'Escape') return leave({ name: 'map' });
     if (e.key === 'Escape') {
       selected = null;
       aim = null;
@@ -341,6 +351,12 @@
 
   <footer class="bar foot">
     <RuleChips rules={opp.rules} />
+    <button
+      class="btn small sound"
+      onclick={() => { save.settings.sound = !save.settings.sound; persist(); sfx('click'); }}
+      aria-pressed={save.settings.sound}
+      aria-label="Sound effects"
+    >{save.settings.sound ? '🔊' : '🔇'}</button>
     <div class="score p0s" aria-label="Your score {live[0]}">● {live[0]}</div>
   </footer>
 
@@ -387,7 +403,8 @@
         </ul>
 
         {#if !prizeDone}
-          <h3>Claim a prize</h3>
+          <h3>Choose a prize</h3>
+          <p class="muted small">Tap a card to keep it. If you leave now, you get the strongest one.</p>
           <div class="grid">
             {#each prizeChoices as id}
               <button class="pick" onclick={() => claim(id)}><Card {id} showName /></button>
@@ -406,12 +423,12 @@
           <p class="muted small">No new cards this time. You already own every card this opponent carries.</p>
         {/if}
 
-        <div class="row">
-          <button class="btn primary" disabled={!prizeDone} onclick={() => go({ name: 'duel', opponent: opp.id, mode, seed: newSeed() })}>Rematch</button>
-          <button class="btn" disabled={!prizeDone} onclick={() => go({ name: 'map' })}>Map</button>
-          <button class="btn" disabled={!prizeDone} onclick={() => go({ name: 'decks', mode })}>Decks</button>
-        </div>
         <p class="muted small">Seed {summary.seed}</p>
+        <div class="row actions">
+          <button class="btn primary" onclick={() => leave({ name: 'duel', opponent: opp.id, mode, seed: newSeed() })}>Rematch</button>
+          <button class="btn" onclick={() => leave({ name: 'map' })}>Map</button>
+          <button class="btn" onclick={() => leave({ name: 'decks', mode })}>Decks</button>
+        </div>
       </div>
     </div>
   {/if}
@@ -428,6 +445,7 @@
   }
   .bar { grid-area: head; display: flex; align-items: center; gap: 10px; }
   .foot { grid-area: foot; justify-content: space-between; }
+  .sound { margin-left: auto; min-width: 44px; }
   .who { flex: 1; display: flex; flex-direction: column; line-height: 1.2; min-width: 0; }
   .score {
     font-weight: 800; font-size: 1.4rem; min-width: 64px; text-align: center;
@@ -481,6 +499,11 @@
   .facts { margin: 0; padding-left: 1.2em; color: var(--muted); }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 10px; }
   .pick { padding: 0; border: 0; background: none; }
+  /* Pinned to the bottom of the dialog, so the exits are always visible. */
+  .actions {
+    position: sticky; bottom: -16px; margin: 0 -16px -16px; padding: 12px 16px 16px;
+    background: linear-gradient(transparent, var(--panel) 30%);
+  }
   .via { text-align: center; font-size: 0.7rem; color: var(--gold); font-weight: 700; text-transform: uppercase; }
 
   @media (min-width: 960px) {

@@ -8,7 +8,7 @@ import type { BoardSize, GameState, HandCard, Move, MoveResult, Rune, Side } fro
 export function toHand(ids: string[], side: Side): HandCard[] {
   return ids.map((id, i) => {
     const c = CARD_BY_ID[id];
-    return { uid: `${side}-${i}-${id}`, id, values: [...c.values], rune: c.rune, boost: 0 };
+    return { uid: `${side}-${i}-${id}`, id, values: [...c.values], rune: c.rune, boost: 0, ability: c.ability };
   });
 }
 

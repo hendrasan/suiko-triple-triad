@@ -118,6 +118,13 @@
     sfx('place');
 
     const fast = save.settings.skipAnimations;
+    if (r.sabotage && !fast) {
+      await wait(150);
+      banner = 'Sabotage!';
+      sfx('sabotage');
+      await wait(500);
+      banner = null;
+    }
     const steps = [...new Set(r.flips.map((f) => f.step))].sort((a, b) => a - b);
     for (const step of steps) {
       const group = r.flips.filter((f) => f.step === step);
@@ -289,6 +296,7 @@
     if (tile && game.rules.runes) extra.push(tile === CARD_BY_ID[preview.id].rune ? `${tile} tile +1` : `${tile} tile −1`);
     if (r.bonds.length) extra.push(`bond: ${r.bonds.map(bondName).join(', ')}`);
     if (r.unite) extra.push(`Unite Attack: ${bondName(r.unite)}`);
+    if (r.sabotage) extra.push(`Sabotage −1 on ${CARD_BY_ID[game.board[r.sabotage.cell]!.card.id].name}`);
     const main = r.flips.length ? `Captures ${r.flips.length}${parts.length ? ` (${parts.join(', ')})` : ''}` : 'No captures';
     return [main, ...extra].join(' · ') + (drag ? '. Release to place.' : '. Tap again to place.');
   });

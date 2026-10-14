@@ -1,4 +1,4 @@
-import type { CardDef, Rarity, Rune, Values } from '../core/types';
+import type { Ability, CardDef, Rarity, Rune, Values } from '../core/types';
 
 // The 108 Stars of Destiny (Suikoden II), plus Jowy and Luca Blight as story cards.
 // Roster checked against gensopedia.org/w/108_Stars and the RPGSite recruitment guide.
@@ -51,28 +51,28 @@ const STARS: Row[] = [
   [37, 'Chikai', 'klaus', 'Klaus', '4 6 5 5', Wi, 'Kiba\'s son. A gentle strategist.'],
   [38, 'Chisatsu', 'gilbert', 'Gilbert', '6 5 5 3', E, 'Highland soldier who changes sides.'],
   [39, 'Chiyuu', 'tetsu', 'Tetsu', '3 5 5 4', W, 'Bath master. Hot water, high standards.'],
-  [40, 'Chiketsu', 'jeane', 'Jeane', '6 3 3 7', L, 'Mysterious rune master.'],
+  [40, 'Chiketsu', 'jeane', 'Jeane', '6 3 3 6', L, 'Mysterious rune master.'],
   [41, 'Chiyuu', 'wakaba', 'Wakaba', '5 6 4 5', Wi, 'Young martial artist from the mountains.'],
-  [42, 'Chii', 'maximillian', 'Maximillian', '7 3 6 3', E, 'Old knight. Still charges first.'],
+  [42, 'Chii', 'maximillian', 'Maximillian', '7 3 5 3', E, 'Old knight. Still charges first.'],
   [43, 'Chiei', 'genshu', 'Genshu', '8 3 3 6', L, 'Master swordsman of few words.'],
   [44, 'Chiki', 'camus', 'Camus', '6 5 4 5', F, 'Red Knight of Matilda.'],
   [45, 'Chimou', 'miklotov', 'Miklotov', '5 5 6 4', W, 'Blue Knight of Matilda.'],
   [46, 'Chibun', 'jude', 'Jude', '3 5 6 4', E, 'Sculptor who carves the castle statues.'],
   [47, 'Chisei', 'lebrante', 'Lebrante', '4 4 5 4', E, 'Appraiser with an eye for urns.'],
-  [48, 'Chikatsu', 'lorelai', 'Lorelai', '6 4 3 6', F, 'Treasure hunter. Fire runes, no fear.'],
+  [48, 'Chikatsu', 'lorelai', 'Lorelai', '5 4 3 6', F, 'Treasure hunter. Fire runes, no fear.'],
   [49, 'Chitou', 'tony', 'Tony', '3 4 6 4', E, 'Farmer of the Forest Village.'],
   [50, 'Chikyou', 'gijimu', 'Gijimu', '7 4 4 4', E, 'Bandit chief with a big axe.'],
   [51, 'Chian', 'rikimaru', 'Rikimaru', '7 5 3 4', F, 'Broke swordsman with a big bill at the inn.'],
-  [52, 'Chijiku', 'gantetsu', 'Gantetsu', '8 2 6 3', E, 'Monk who tests your strength.'],
+  [52, 'Chijiku', 'gantetsu', 'Gantetsu', '7 2 6 3', E, 'Monk who tests your strength.'],
   [53, 'Chikai', 'simone', 'Simone', '4 5 4 5', Wi, 'Self-styled noble with a rose.'],
   [54, 'Chisa', 'connell', 'Connell', '4 4 4 5', L, 'Musician who knows every sound.'],
   [55, 'Chiyuu', 'hans', 'Hans', '3 4 5 4', E, 'Armor smith. Opens a shop at the castle.'],
-  [56, 'Chirei', 'huan', 'Huan', '4 5 6 4', W, 'Doctor of the alliance.'],
+  [56, 'Chirei', 'huan', 'Huan', '4 4 6 4', W, 'Doctor of the alliance.'],
   [57, 'Chijuu', 'tuta', 'Tuta', '3 4 5 4', W, 'Huan\'s apprentice. Runs everywhere.'],
   [58, 'Chibi', 'futch', 'Futch', '6 5 3 5', Wi, 'Dragon knight without a dragon.'],
-  [59, 'Chikyuu', 'tomo', 'Tomo', '5 5 4 5', Wi, 'Tsai\'s daughter. Wind runes and a spear.', 'Kasumi takes this star if chosen instead of Valeria.'],
+  [59, 'Chikyuu', 'tomo', 'Tomo', '5 4 4 5', Wi, 'Tsai\'s daughter. Wind runes and a spear.', 'Kasumi takes this star if chosen instead of Valeria.'],
   [60, 'Chibaku', 'badeaux', 'Badeaux', '4 3 6 5', E, 'Beast tamer of the forest.'],
-  [61, 'Chizen', 'mazus', 'Mazus', '8 2 2 7', F, 'Sorcerer of the Tinto Mines. Dangerous.'],
+  [61, 'Chizen', 'mazus', 'Mazus', '7 2 2 7', F, 'Sorcerer of the Tinto Mines. Dangerous.'],
   [62, 'Chikou', 'mondo', 'Mondo', '5 5 4 4', L, 'Rokkaku ninja. Patient.'],
   [63, 'Chikyou', 'sasuke', 'Sasuke', '4 6 3 5', Wi, 'Young Rokkaku ninja. Impatient.'],
   [64, 'Chihi', 'leona', 'Leona', '3 5 5 4', F, 'Keeper of the tavern and its secrets.'],
@@ -124,6 +124,14 @@ const STARS: Row[] = [
 
 const parse = (s: string) => s.split(' ').map(Number) as Values;
 
+// Passive abilities (Earthly Stars only). These cards pay CONFIG.abilityStatCost stat points.
+const ABILITY: Record<string, Ability> = {
+  hans: 'steadfast', gantetsu: 'steadfast', barbara: 'steadfast', maximillian: 'steadfast', gadget: 'steadfast',
+  leona: 'rally', annallee: 'rally', connell: 'rally', huan: 'rally', apple: 'rally',
+  hoi: 'sabotage', shilo: 'sabotage', sasuke: 'sabotage', koyu: 'sabotage', 'lo-wen': 'sabotage',
+  jeane: 'runeborn', mazus: 'runeborn', lorelai: 'runeborn', tomo: 'runeborn', tetsu: 'runeborn',
+};
+
 function rarityOf(no: number, id: string): Rarity {
   if (id === 'hero') return 'special';
   return no <= 36 ? 'rare' : 'common';
@@ -131,7 +139,7 @@ function rarityOf(no: number, id: string): Rarity {
 
 export const CARDS: CardDef[] = [
   ...STARS.map(([no, star, id, name, v, rune, blurb, flag]): CardDef => ({
-    id, name, starNo: no, starName: star, rarity: rarityOf(no, id), values: parse(v), rune, blurb,
+    id, name, starNo: no, starName: star, rarity: rarityOf(no, id), values: parse(v), rune, ability: ABILITY[id], blurb,
     flag,
   })),
   { id: 'jowy', name: 'Jowy', rarity: 'special', values: [8, 6, 7, 7], rune: L, blurb: 'The Hero\'s best friend. Bearer of the Black Sword Rune.', flag: 'Not one of the 108. Story card.' },

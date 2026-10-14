@@ -1,6 +1,7 @@
 <script lang="ts">
   import { CONFIG } from '../core/config';
   import { hintFor } from '../core/progress';
+  import { ABILITIES } from '../data/abilities';
   import { BONDS } from '../data/bonds';
   import type { CardDef } from '../core/types';
   import { CARDS } from '../data/cards';
@@ -70,6 +71,11 @@
           <span class="chip">Total {open.values.reduce((a, v) => a + v, 0)}</span>
           {#if save.via[open.id]}<span class="chip">{VIA[save.via[open.id]] ?? save.via[open.id]}</span>{/if}
         </div>
+        {#if open.ability}
+          <div class="ability small">
+            <strong>{ABILITIES[open.ability].name}</strong> — {ABILITIES[open.ability].text}
+          </div>
+        {/if}
         {@const bonds = BONDS.filter((b) => b.members.includes(open!.id))}
         {#if bonds.length}
           <div class="small">
@@ -107,5 +113,6 @@
   .detail h2 { margin: 0; }
   .detail p { margin: 0; }
   .detail ul { margin: 4px 0 0; padding-left: 1.2em; }
+  .ability { border-left: 3px solid #c8a6ff; padding-left: 8px; }
   .flag { color: var(--gold); border-left: 3px solid var(--gold); padding-left: 8px; }
 </style>

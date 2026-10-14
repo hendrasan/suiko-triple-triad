@@ -53,7 +53,7 @@ export function evaluate(s: GameState, me: Side, w: Weights): number {
   s.board.forEach((p, cell) => {
     if (!p) return;
     const sign = p.owner === me ? 1 : -1;
-    if (s.rules.runes) rune += sign * runeMod(p.card.rune, s.tiles[cell]);
+    if (s.rules.runes) rune += sign * runeMod(p.card.rune, s.tiles[cell], p.card.ability);
     for (const d of DIRS) {
       const n = neighbor(s.size, cell, d);
       if (n >= 0 && !s.board[n]) exposure += sign * (10 - sideValue(s, cell, d)) / 10;

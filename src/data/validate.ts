@@ -12,8 +12,11 @@ export function checkBudgets(): string[] {
   const errs: string[] = [];
   for (const c of CARDS) {
     const b = CONFIG.budgets[c.rarity];
+    const cut = c.ability ? CONFIG.abilityStatCost : 0;
     const sum = c.values.reduce((a, v) => a + v, 0);
-    if (sum < b.min || sum > b.max) errs.push(`${c.id}: sum ${sum} outside ${c.rarity} budget ${b.min}-${b.max}`);
+    const [lo, hi] = [b.min - cut, b.max - cut];
+    if (sum < lo || sum > hi) errs.push(`${c.id}: sum ${sum} outside ${c.rarity}${cut ? ' + ability' : ''} budget ${lo}-${hi}`);
+    if (c.ability && c.rarity !== 'common') errs.push(`${c.id}: abilities are for Earthly Stars only`);
     if (c.values.some((v) => v < 1 || v > b.maxSide)) errs.push(`${c.id}: a value is outside 1-${b.maxSide}`);
   }
   return errs;

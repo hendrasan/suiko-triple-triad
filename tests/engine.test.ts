@@ -275,3 +275,64 @@ describe('bond reporting', () => {
     expect(applyMove(s, { hand: 0, cell: 4 }, bonds).bonds).toEqual(['pair']);
   });
 });
+
+describe('abilities', () => {
+  const withAbility = (c: HandCard, ability: HandCard['ability']): HandCard => ({ ...c, ability });
+
+  it('Steadfast blocks Same but not normal flips', () => {
+    const s = setup({
+      rules: { same: true },
+      board: { 1: [withAbility(card([9, 9, 5, 9]), 'steadfast'), 1], 3: [card([9, 5, 9, 9]), 1] },
+      hand0: [card([5, 1, 1, 5])],
+    });
+    expect(applyMove(s, { hand: 0, cell: 4 }).flips.map((f) => f.cell)).toEqual([3]);
+    const t = setup({ board: { 1: [withAbility(card(flat(2)), 'steadfast'), 1] }, hand0: [card(flat(5))] });
+    expect(applyMove(t, { hand: 0, cell: 4 }).flips.map((f) => f.cell)).toEqual([1]);
+  });
+
+  it('Steadfast blocks Combo', () => {
+    const s = setup({
+      rules: { same: true, combo: true },
+      board: {
+        1: [card([9, 9, 5, 9]), 1], 3: [card([9, 5, 9, 9]), 1],
+        0: [withAbility(card(flat(1)), 'steadfast'), 1],
+      },
+      hand0: [card([5, 1, 1, 5])],
+    });
+    expect(applyMove(s, { hand: 0, cell: 4 }).flips.some((f) => f.cell === 0)).toBe(false);
+  });
+
+  it('Rally gives +1 to the touching side of allies, and follows the owner', () => {
+    // Rally at 4 (ours). Our card at 3: its right side (touching 4) gets +1.
+    const s = setup({ board: { 4: [withAbility(card(flat(1)), 'rally'), 0], 3: [card(flat(5)), 0] } });
+    expect(sideValue(s, 3, 1)).toBe(6);
+    expect(sideValue(s, 3, 0)).toBe(5);
+    s.board[4]!.owner = 1;
+    expect(sideValue(s, 3, 1)).toBe(5);
+  });
+
+  it('Sabotage weakens the strongest adjacent enemy before attacks', () => {
+    // Enemy above (bottom 5) and left (right 3). Placed card has top 5: a tie, so no flip without Sabotage.
+    const s = setup({
+      board: { 1: [card([9, 9, 5, 9]), 1], 3: [card([9, 3, 9, 9]), 1] },
+      hand0: [withAbility(card([5, 1, 1, 1]), 'sabotage')],
+    });
+    const r = applyMove(s, { hand: 0, cell: 4 });
+    expect(r.sabotage).toEqual({ cell: 1, side: 2 });
+    expect(r.flips.map((f) => f.cell)).toEqual([1]);
+    // The wound stays after the card changes sides.
+    expect(sideValue(r.state, 1, 2)).toBe(4);
+  });
+
+  it('Rune-born gets +2 on a matching tile and no penalty on others', () => {
+    const tiles: (Rune | null)[] = new Array(9).fill(null);
+    tiles[4] = 'fire';
+    tiles[0] = 'water';
+    const s = setup({
+      rules: { runes: true }, tiles,
+      board: { 4: [withAbility(card(flat(5), 'x', 'fire'), 'runeborn'), 0], 0: [withAbility(card(flat(5), 'y', 'fire'), 'runeborn'), 0] },
+    });
+    expect(sideValue(s, 4, 0)).toBe(7);
+    expect(sideValue(s, 0, 0)).toBe(5);
+  });
+});

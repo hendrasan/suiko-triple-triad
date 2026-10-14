@@ -3,6 +3,9 @@
 export type Rune = 'fire' | 'water' | 'wind' | 'earth' | 'lightning';
 export const RUNES: Rune[] = ['fire', 'water', 'wind', 'earth', 'lightning'];
 
+/** Passive card abilities. Only some Earthly Stars have one. */
+export type Ability = 'steadfast' | 'rally' | 'sabotage' | 'runeborn';
+
 /** 'rare' = Heavenly Star, 'common' = Earthly Star, 'special' = Hero/Jowy, 'boss' = Luca. */
 export type Rarity = 'common' | 'rare' | 'special' | 'boss';
 
@@ -22,6 +25,7 @@ export interface CardDef {
   rarity: Rarity;
   values: Values;
   rune: Rune;
+  ability?: Ability;
   /** One-line flavour shown on the card detail. */
   blurb: string;
   /** Set when the roster entry needs a human check. */
@@ -59,6 +63,7 @@ export interface HandCard {
   rune: Rune | null;
   /** Pre-duel boost (handicap). Added to all four sides. */
   boost: number;
+  ability?: Ability;
   /** True for the AI's stand-in for cards it cannot see. */
   hidden?: boolean;
 }
@@ -66,6 +71,8 @@ export interface HandCard {
 export interface PlacedCard {
   card: HandCard;
   owner: Side;
+  /** Lasting penalty per side from Sabotage. Stays when the card changes sides. */
+  wound?: number[];
 }
 
 export interface Formation {
@@ -111,4 +118,6 @@ export interface MoveResult {
   /** Bond ids that became active (partners touching) with this move. */
   bonds: string[];
   unite: string | null;
+  /** The cell and side that Sabotage weakened, if any. */
+  sabotage: { cell: number; side: number } | null;
 }

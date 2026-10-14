@@ -20,6 +20,14 @@ export const CONFIG = {
   bondBonus: 1,
   runeMatch: 1,
   runeMismatch: -1,
+  /** Abilities. Rune-born: bonus on a matching tile, and no penalty on other runes. */
+  runeBornMatch: 2,
+  /** Rally: bonus to the side of an allied card that touches the Rally card. */
+  rallyBonus: 1,
+  /** Sabotage: lasting penalty on one side of the strongest adjacent enemy card. */
+  sabotagePenalty: 1,
+  /** A card with an ability has this many fewer stat points in its budget. */
+  abilityStatCost: 2,
   deckSize: { 3: 5, 4: 8 } as Record<BoardSize, number>,
   /** Quad Quartet deck cost cap. Triple Triad has no cap. */
   costCap: 30,

@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { FlipCause, Side } from '../core/types';
+  import { ABILITIES } from '../data/abilities';
   import { CARD_BY_ID } from '../data/cards';
+  import AbilityIcon from './AbilityIcon.svelte';
   import Portrait from './Portrait.svelte';
   import RuneIcon from './RuneIcon.svelte';
 
@@ -43,6 +45,7 @@
     faceDown || !def
       ? 'Face-down card'
       : `${def.name}, ${shown.map((v, i) => `${SIDE[i]} ${fmt(v)}`).join(', ')}, ${def.rune}` +
+        (def.ability ? `, ${ABILITIES[def.ability].name}` : '') +
         (owner === 0 ? ', yours' : owner === 1 ? ', opponent' : ''),
   );
 </script>
@@ -74,6 +77,7 @@
             <span class="v {POS[d]}" class:up={delta(d) > 0} class:down={delta(d) < 0}>{fmt(v)}</span>
           {/each}
         </div>
+        {#if def.ability}<span class="ability"><AbilityIcon ability={def.ability} /></span>{/if}
         {#if bond}<span class="bond" title="Bond active" aria-hidden="true">⛓</span>{/if}
         {#if boost}<span class="boost" aria-hidden="true">+{boost}</span>{/if}
       {/if}
@@ -159,8 +163,13 @@
   .v.up { color: #a6f3a9; }
   .v.down { color: #ff9c8a; }
 
+  .ability {
+    position: absolute; bottom: 3%; left: 3%;
+    width: 18cqw; height: 18cqw; padding: 2.5cqw; border-radius: 50%;
+    background: rgb(0 0 0 / 0.6); box-shadow: 0 0 0 1px rgb(255 255 255 / 0.15);
+  }
   .bond {
-    position: absolute; bottom: 4%; left: 6%;
+    position: absolute; bottom: 4%; left: 50%; transform: translateX(-50%);
     font-size: 13cqw; color: var(--gold-2);
     text-shadow: 0 0 6px var(--gold), 0 0 2px #000;
   }

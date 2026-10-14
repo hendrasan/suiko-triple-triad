@@ -61,7 +61,7 @@ export function createGame(g: NewGame): GameState {
 export function clone(s: GameState): GameState {
   return {
     ...s,
-    board: s.board.map((p) => (p ? { card: p.card, owner: p.owner } : null)),
+    board: s.board.map((p) => (p ? { ...p } : null)),
     hands: [s.hands[0].slice(), s.hands[1].slice()],
     uniteUsed: [s.uniteUsed[0], s.uniteUsed[1]],
   };
@@ -69,9 +69,15 @@ export function clone(s: GameState): GameState {
 
 const clamp = (v: number) => (v < 1 ? 1 : v > 10 ? 10 : v);
 
-export function runeMod(rune: Rune | null, tile: Rune | null): number {
+export function runeMod(rune: Rune | null, tile: Rune | null, ability?: HandCard['ability']): number {
   if (!tile || !rune) return 0;
+  if (ability === 'runeborn') return rune === tile ? CONFIG.runeBornMatch : 0;
   return rune === tile ? CONFIG.runeMatch : CONFIG.runeMismatch;
+}
+
+/** Steadfast cards cannot be flipped by Same, Plus, or Combo. */
+export function isSteadfast(s: GameState, cell: number): boolean {
+  return s.board[cell]?.card.ability === 'steadfast';
 }
 
 export function isBonded(s: GameState, a: string, b: string): boolean {
@@ -94,9 +100,13 @@ export function hasBondPartner(s: GameState, cell: number): boolean {
 /** The value a placed card shows on side d, with all modifiers. */
 export function sideValue(s: GameState, cell: number, d: number): number {
   const p = s.board[cell] as PlacedCard;
-  let v = p.card.values[d] + p.card.boost;
-  if (s.rules.runes) v += runeMod(p.card.rune, s.tiles[cell]);
+  let v = p.card.values[d] + p.card.boost - (p.wound?.[d] ?? 0);
+  if (s.rules.runes) v += runeMod(p.card.rune, s.tiles[cell], p.card.ability);
   if (s.rules.bonds && hasBondPartner(s, cell)) v += CONFIG.bondBonus;
+  // Rally: an allied Rally card on this side lends +1 to this side. It follows the Rally card's current owner.
+  const n = neighbor(s.size, cell, d);
+  const q = n >= 0 ? s.board[n] : null;
+  if (q && q.owner === p.owner && q.card.ability === 'rally') v += CONFIG.rallyBonus;
   return clamp(v);
 }
 
@@ -239,6 +249,26 @@ export function applyMove(state: GameState, move: Move, bonds?: BondDef[]): Move
 
   const P = move.cell;
   const nbrs = DIRS.map((d) => neighbor(s.size, P, d));
+
+  // Sabotage acts first: the adjacent enemy with the highest facing value loses 1 on that side.
+  let sabotage: MoveResult['sabotage'] = null;
+  if (card.ability === 'sabotage') {
+    let best = -1;
+    for (const d of DIRS) {
+      const n = nbrs[d];
+      const q = n >= 0 ? s.board[n] : null;
+      if (!q || q.owner === me) continue;
+      const v = sideValue(s, n, opposite(d));
+      if (v > best) { best = v; sabotage = { cell: n, side: opposite(d) }; }
+    }
+    if (sabotage) {
+      const q = s.board[sabotage.cell] as PlacedCard;
+      const wound = [...(q.wound ?? [0, 0, 0, 0])];
+      wound[sabotage.side] += CONFIG.sabotagePenalty;
+      s.board[sabotage.cell] = { ...q, wound };
+    }
+  }
+
   const mine = DIRS.map((d) => (nbrs[d] >= 0 && s.board[nbrs[d]] ? sideValue(s, P, d) : 0));
   const theirs = DIRS.map((d) => (nbrs[d] >= 0 && s.board[nbrs[d]] ? sideValue(s, nbrs[d], opposite(d)) : 0));
   const isEnemy = (cell: number) => cell >= 0 && !!s.board[cell] && s.board[cell]!.owner !== me;
@@ -249,7 +279,7 @@ export function applyMove(state: GameState, move: Move, bonds?: BondDef[]): Move
     if (match.length >= CONFIG.sameThreshold) {
       for (const d of match) {
         const n = nbrs[d];
-        if (isEnemy(n) && !flipped.has(n)) { flip(n, 'same', 1); special.push(n); }
+        if (isEnemy(n) && !flipped.has(n) && !isSteadfast(s, n)) { flip(n, 'same', 1); special.push(n); }
       }
     }
   }
@@ -264,7 +294,7 @@ export function applyMove(state: GameState, move: Move, bonds?: BondDef[]): Move
       if (ds.length < CONFIG.plusThreshold) continue;
       for (const d of ds) {
         const n = nbrs[d];
-        if (isEnemy(n) && !flipped.has(n)) { flip(n, 'plus', 1); special.push(n); }
+        if (isEnemy(n) && !flipped.has(n) && !isSteadfast(s, n)) { flip(n, 'plus', 1); special.push(n); }
       }
     }
   }
@@ -280,7 +310,7 @@ export function applyMove(state: GameState, move: Move, bonds?: BondDef[]): Move
       const { cell, step } = queue.shift()!;
       for (const d of DIRS) {
         const n = neighbor(s.size, cell, d);
-        if (!isEnemy(n)) continue;
+        if (!isEnemy(n) || isSteadfast(s, n)) continue;
         if (sideValue(s, cell, d) > sideValue(s, n, opposite(d))) {
           flip(n, 'combo', step + 1);
           queue.push({ cell: n, step: step + 1 });
@@ -316,5 +346,5 @@ export function applyMove(state: GameState, move: Move, bonds?: BondDef[]): Move
   }
 
   s.turn = (1 - me) as Side;
-  return { state: s, flips, bonds: [...bondIds], unite };
+  return { state: s, flips, bonds: [...bondIds], unite, sabotage };
 }

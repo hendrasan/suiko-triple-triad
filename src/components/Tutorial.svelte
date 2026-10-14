@@ -3,6 +3,7 @@
   import type { FlipCause, GameState } from '../core/types';
   import { BONDS } from '../data/bonds';
   import { LESSONS, buildLesson } from '../data/tutorial';
+  import { dragToCell } from '../lib/drag';
   import { sfx, wait } from '../lib/fx';
   import { go } from '../stores/nav.svelte';
   import { persist, save } from '../stores/save.svelte';
@@ -92,7 +93,21 @@
 
   <div class="hand">
     {#each game.hands[0] as c, i (c.uid)}
-      <button class="hc" onclick={() => (selected = i)} aria-pressed={selected === i}>
+      <button
+        class="hc"
+        onclick={() => (selected = i)}
+        aria-pressed={selected === i}
+        use:dragToCell={{
+          enabled: () => result === 'none',
+          start: () => (selected = i),
+          move: (_x, _y, cell) => (aim = cell),
+          drop: (cell) => {
+            if (cell === null) return;
+            aim = cell;
+            pick(cell);
+          },
+        }}
+      >
         <Card id={c.id} values={c.values} base={c.values} owner={0} selected={selected === i} showName />
       </button>
     {/each}
@@ -115,6 +130,6 @@
   .status { min-height: 3em; margin: 0; text-align: center; color: var(--muted); }
   .ok { color: var(--ok); }
   .hand { display: flex; justify-content: center; }
-  .hc { width: 96px; padding: 0; border: 0; background: none; }
+  .hc { width: 96px; padding: 0; border: 0; background: none; touch-action: none; }
   .actions { justify-content: center; }
 </style>

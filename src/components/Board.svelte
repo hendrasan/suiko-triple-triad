@@ -53,6 +53,7 @@
     <button
       bind:this={cells[cell]}
       class="cell"
+      data-cell={cell}
       class:tile={!!tile}
       class:last={lastPlaced === cell}
       class:aim={ghost?.cell === cell}

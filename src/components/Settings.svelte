@@ -79,6 +79,7 @@
       <button class="btn" onclick={() => go({ name: 'tutorial' })}>Replay tutorial</button>
     </div>
     <p class="muted small">
+      Play: drag a card to the board, or tap a card and then a cell (tap the cell again to confirm).
       Keyboard: number keys pick a hand card, arrow keys move on the board, Enter places, Escape cancels.
       Ownership: your cards have a solid blue frame and ●. Opponent cards have a dashed orange frame, stripes, and ◆.
     </p>

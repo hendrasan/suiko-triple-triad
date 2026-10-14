@@ -12,6 +12,7 @@
   import { BONDS } from '../data/bonds';
   import { CARD_BY_ID } from '../data/cards';
   import { OPPONENT_BY_ID } from '../data/opponents';
+  import { dragToCell } from '../lib/drag';
   import { sfx, wait } from '../lib/fx';
   import { go, type Screen } from '../stores/nav.svelte';
   import { activeDeck, addCard, ownedSet, persist, save } from '../stores/save.svelte';
@@ -51,6 +52,9 @@
   let busy = $state(false);
   let lastPlaced = $state<number | null>(null);
   let hint = $state('');
+  // Card being dragged from the hand: index, pointer position, and width for the floating copy.
+  let drag = $state<{ i: number; x: number; y: number; w: number } | null>(null);
+  let handEls: HTMLButtonElement[] = $state([]);
 
   let summary = $state<MatchSummary | null>(null);
   let joined = $state<Recruit[]>([]);
@@ -229,6 +233,20 @@
     sfx('select');
   }
 
+  function startDrag(i: number) {
+    selected = i;
+    aim = null;
+    hint = '';
+    drag = { i, x: -999, y: -999, w: handEls[i]?.getBoundingClientRect().width ?? 80 };
+    sfx('select');
+  }
+
+  function dropDrag(i: number, cell: number | null) {
+    drag = null;
+    if (cell !== null && myTurn && !game.board[cell]) play({ hand: i, cell });
+    else aim = null;
+  }
+
   function pick(cell: number) {
     if (!myTurn || game.board[cell]) return;
     if (selected === null) {
@@ -272,7 +290,7 @@
     if (r.bonds.length) extra.push(`bond: ${r.bonds.map(bondName).join(', ')}`);
     if (r.unite) extra.push(`Unite Attack: ${bondName(r.unite)}`);
     const main = r.flips.length ? `Captures ${r.flips.length}${parts.length ? ` (${parts.join(', ')})` : ''}` : 'No captures';
-    return [main, ...extra].join(' · ') + '. Tap again to place.';
+    return [main, ...extra].join(' · ') + (drag ? '. Release to place.' : '. Tap again to place.');
   });
 
   const shownOwner = (cell: number): Side => hidden[cell] ?? game.board[cell]?.owner ?? 0;
@@ -289,8 +307,9 @@
     if (busy && game.turn === 1) return `${opp.name} is thinking…`;
     if (busy) return '';
     if (preview) return previewText;
+    if (drag) return 'Drop the card on an empty cell.';
     if (selected !== null) return 'Choose a cell. Flips show before you confirm.';
-    return 'Your turn. Choose a card.';
+    return 'Your turn. Drag a card to the board, or tap a card, then a cell.';
   });
 
   const outcome = $derived(summary ? (summary.won ? 'Victory' : summary.draw ? 'Draw' : 'Defeat') : '');
@@ -336,8 +355,19 @@
   <div class="my-hand" class:boosting={phase === 'handicap'} role="listbox" aria-label="Your hand">
     {#each game.hands[0] as c, i (c.uid)}
       <button
+        bind:this={handEls[i]}
         class="hand-card"
         class:sel={selected === i}
+        class:lifted={drag?.i === i}
+        use:dragToCell={{
+          enabled: () => myTurn,
+          start: () => startDrag(i),
+          move: (x, y, cell) => {
+            if (drag) drag = { ...drag, x, y };
+            aim = cell;
+          },
+          drop: (cell) => dropDrag(i, cell),
+        }}
         role="option"
         aria-selected={selected === i}
         disabled={!(myTurn || phase === 'handicap')}
@@ -348,6 +378,13 @@
       </button>
     {/each}
   </div>
+
+  {#if drag && drag.x > -999}
+    {@const c = game.hands[0][drag.i]}
+    <div class="drag-ghost" style="left:{drag.x}px; top:{drag.y}px; width:{drag.w}px" aria-hidden="true">
+      <Card id={c.id} boost={c.boost} owner={0} />
+    </div>
+  {/if}
 
   <footer class="bar foot">
     <RuleChips rules={opp.rules} />
@@ -476,7 +513,13 @@
   .s4 .my-hand { grid-template-columns: repeat(4, 1fr); }
   .my-hand.boosting .hand-card { animation: glow 1.2s ease-in-out infinite alternate; border-radius: 10px; }
   @keyframes glow { from { box-shadow: 0 0 0 0 transparent; } to { box-shadow: 0 0 0 3px var(--gold); } }
-  .hand-card { position: relative; padding: 0; border: 0; background: none; min-height: var(--tap); }
+  .hand-card { position: relative; padding: 0; border: 0; background: none; min-height: var(--tap); touch-action: none; }
+  .hand-card.lifted { opacity: 0.3; }
+  .drag-ghost {
+    position: fixed; z-index: 30; pointer-events: none;
+    transform: translate(-50%, -60%) scale(1.1) rotate(-3deg);
+    filter: drop-shadow(0 12px 18px rgb(0 0 0 / 0.6));
+  }
   .hand-card:disabled { cursor: default; }
   .hand-card:disabled :global(.card) { filter: saturate(0.7) brightness(0.85); }
   .key {

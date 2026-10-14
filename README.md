@@ -42,7 +42,7 @@ Card and opponent art is in `public/portraits/<file>.webp`. The default file nam
 - **Unite Attack**: when a formation (3–4 bonded cards in the bond's shape) is complete, the owner flips the adjacent enemy card with the lowest touching value. Once per duel per side. No chain.
 - **Abilities** (20 Earthly Stars, icon in the bottom-left corner of the card). A card with an ability has 2 fewer stat points (`abilityStatCost`).
   - **Steadfast** (Hans, Gantetsu, Barbara, Maximillian, Gadget): Same, Plus, and Combo cannot flip it. Normal flips and Unite Attacks can.
-  - **Rally** (Leona, Annallee, Connell, Huan, Apple): allied cards next to it get +1 on the side that touches it. The bonus follows the card's current owner.
+  - **Rally** (Leona, Annallee, Connell, Huan, Apple): allied cards next to it get +1 on all sides (at most +1). The bonus follows the card's current owner.
   - **Sabotage** (Hoi, Shilo, Sasuke, Koyu, Lo Wen): when placed, the adjacent enemy card with the highest facing value loses 1 on that side, before attacks. The −1 lasts all game, even if that card changes sides.
   - **Rune-born** (Jeane, Mazus, Lorelai, Tomo, Tetsu): +2 on a matching rune tile, and no −1 on other runes.
 - **Sound**: ZzFX sound effects, generated in the browser (no audio files). On by default; toggle with 🔊 in a duel or in Settings.

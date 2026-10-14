@@ -22,7 +22,7 @@ export const CONFIG = {
   runeMismatch: -1,
   /** Abilities. Rune-born: bonus on a matching tile, and no penalty on other runes. */
   runeBornMatch: 2,
-  /** Rally: bonus to the side of an allied card that touches the Rally card. */
+  /** Rally: bonus to all sides of allied cards next to a Rally card (max one bonus per card). */
   rallyBonus: 1,
   /** Sabotage: lasting penalty on one side of the strongest adjacent enemy card. */
   sabotagePenalty: 1,

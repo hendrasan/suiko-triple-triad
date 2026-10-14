@@ -1,5 +1,5 @@
 import { createGame } from '../core/engine';
-import type { FlipCause, GameState, HandCard, Rules, Rune, Side, Values } from '../core/types';
+import type { Ability, FlipCause, GameState, HandCard, Rules, Rune, Side, Values } from '../core/types';
 import { BONDS } from './bonds';
 import { CARD_BY_ID } from './cards';
 
@@ -13,6 +13,8 @@ export interface Lesson {
   hand: [string, Values][];
   goal: FlipCause;
   success: string;
+  /** The ability this lesson teaches. The test checks that the goal needs it. */
+  teaches?: Ability;
 }
 
 // 3x3 cells:  0 1 2 / 3 4 5 / 6 7 8
@@ -72,12 +74,55 @@ export const LESSONS: Lesson[] = [
     goal: 'basic',
     success: 'With her brother beside her, Nanami\'s 6 became 7. Bonds cost deck slots, so choose them with care.',
   },
+  {
+    title: 'Abilities: Steadfast',
+    text: 'Some Earthly Stars have an ability. Its icon is in the bottom-left corner of the card. Steadfast (shield) cannot be flipped by Same, Plus, or Combo. Hans is Steadfast. Use Same in the center and see who stands firm.',
+    rules: { same: true },
+    board: [[1, 'hans', [8, 8, 6, 8], 1], [3, 'gilbert', [8, 4, 8, 8], 1]],
+    hand: [['flik', [6, 2, 2, 4]]],
+    goal: 'same',
+    teaches: 'steadfast',
+    success: 'Same flipped Gilbert, but Hans did not move. Only a higher value can flip a Steadfast card.',
+  },
+  {
+    title: 'Abilities: Rally',
+    text: 'Rally (banner): your cards next to a Rally card get +1 on all sides. Leona is yours and has Rally. Nanami\'s 6 ties with the enemy\'s 6… unless she stands next to Leona.',
+    rules: {},
+    board: [[3, 'leona', [3, 3, 3, 3], 0], [1, 'zamza', [6, 6, 6, 6], 1]],
+    hand: [['nanami', [6, 3, 3, 3]]],
+    goal: 'basic',
+    teaches: 'rally',
+    success: 'Leona rallied Nanami to 7. Careful: if a Rally card is flipped, its bonus helps its new owner.',
+  },
+  {
+    title: 'Abilities: Sabotage',
+    text: 'Sabotage (dagger): when placed, the strongest enemy card next to it loses 1 on the side that faces it, before the attack. The −1 lasts all game. Hoi\'s top is 5, the same as the enemy\'s bottom. Place him below it.',
+    rules: {},
+    board: [[1, 'zamza', [5, 5, 5, 5], 1]],
+    hand: [['hoi', [5, 2, 2, 2]]],
+    goal: 'basic',
+    teaches: 'sabotage',
+    success: 'Hoi\'s trick dropped the enemy\'s 5 to 4, and then his 5 won.',
+  },
+  {
+    title: 'Abilities: Rune-born',
+    text: 'Rune-born (spark): +2 on a matching rune tile, and no −1 on other runes. Mazus is Fire and Rune-born. A normal card would get only +1 on the Fire tile and tie with the 6 above it.',
+    rules: { runes: true },
+    tiles: { 4: 'fire', 3: 'water' },
+    board: [[1, 'zamza', [6, 6, 6, 6], 1]],
+    hand: [['mazus', [5, 2, 2, 2]]],
+    goal: 'basic',
+    teaches: 'runeborn',
+    success: 'On the Fire tile Mazus became 7 and won. That is the whole tutorial. Good luck, Hero!',
+  },
 ];
 
 const OFF: Rules = { same: false, plus: false, combo: false, runes: false, bonds: false, unite: false };
 
 export function buildLesson(l: Lesson): GameState {
-  const hc = (id: string, values: Values, uid: string): HandCard => ({ uid, id, values, rune: CARD_BY_ID[id].rune, boost: 0 });
+  const hc = (id: string, values: Values, uid: string): HandCard => ({
+    uid, id, values, rune: CARD_BY_ID[id].rune, boost: 0, ability: CARD_BY_ID[id].ability,
+  });
   const hand = l.hand.map(([id, v], i) => hc(id, v, `h${i}`));
   const pre = l.board.map(([, id, v], i) => hc(id, v, `b${i}`));
   const tiles: (Rune | null)[] = new Array(9).fill(null);

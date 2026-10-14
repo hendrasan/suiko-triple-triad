@@ -97,16 +97,25 @@ export function hasBondPartner(s: GameState, cell: number): boolean {
   return false;
 }
 
+/** True when an allied Rally card touches the card at `cell`. Follows the Rally card's current owner. */
+export function hasRally(s: GameState, cell: number): boolean {
+  const p = s.board[cell];
+  if (!p) return false;
+  for (const d of DIRS) {
+    const n = neighbor(s.size, cell, d);
+    const q = n >= 0 ? s.board[n] : null;
+    if (q && q.owner === p.owner && q.card.ability === 'rally') return true;
+  }
+  return false;
+}
+
 /** The value a placed card shows on side d, with all modifiers. */
 export function sideValue(s: GameState, cell: number, d: number): number {
   const p = s.board[cell] as PlacedCard;
   let v = p.card.values[d] + p.card.boost - (p.wound?.[d] ?? 0);
   if (s.rules.runes) v += runeMod(p.card.rune, s.tiles[cell], p.card.ability);
   if (s.rules.bonds && hasBondPartner(s, cell)) v += CONFIG.bondBonus;
-  // Rally: an allied Rally card on this side lends +1 to this side. It follows the Rally card's current owner.
-  const n = neighbor(s.size, cell, d);
-  const q = n >= 0 ? s.board[n] : null;
-  if (q && q.owner === p.owner && q.card.ability === 'rally') v += CONFIG.rallyBonus;
+  if (hasRally(s, cell)) v += CONFIG.rallyBonus;
   return clamp(v);
 }
 

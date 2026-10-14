@@ -302,13 +302,19 @@ describe('abilities', () => {
     expect(applyMove(s, { hand: 0, cell: 4 }).flips.some((f) => f.cell === 0)).toBe(false);
   });
 
-  it('Rally gives +1 to the touching side of allies, and follows the owner', () => {
-    // Rally at 4 (ours). Our card at 3: its right side (touching 4) gets +1.
-    const s = setup({ board: { 4: [withAbility(card(flat(1)), 'rally'), 0], 3: [card(flat(5)), 0] } });
-    expect(sideValue(s, 3, 1)).toBe(6);
-    expect(sideValue(s, 3, 0)).toBe(5);
+  it('Rally gives +1 on all sides of adjacent allies, max +1, and follows the owner', () => {
+    const s = setup({
+      board: { 4: [withAbility(card(flat(1)), 'rally'), 0], 0: [withAbility(card(flat(1)), 'rally'), 0], 3: [card(flat(5)), 0] },
+    });
+    expect([0, 1, 2, 3].map((d) => sideValue(s, 3, d))).toEqual([6, 6, 6, 6]);
     s.board[4]!.owner = 1;
-    expect(sideValue(s, 3, 1)).toBe(5);
+    s.board[0]!.owner = 1;
+    expect(sideValue(s, 3, 0)).toBe(5);
+  });
+
+  it('Rally helps a placed card win a fight', () => {
+    const s = setup({ board: { 3: [withAbility(card(flat(1)), 'rally'), 0], 1: [card(flat(6)), 1] }, hand0: [card([6, 1, 1, 1])] });
+    expect(applyMove(s, { hand: 0, cell: 4 }).flips.map((f) => f.cell)).toEqual([1]);
   });
 
   it('Sabotage weakens the strongest adjacent enemy before attacks', () => {

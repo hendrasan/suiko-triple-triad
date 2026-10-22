@@ -67,12 +67,21 @@ export const LESSONS: Lesson[] = [
   },
   {
     title: 'Bonds',
-    text: 'Bonded Stars get +1 on all sides while they touch an ally partner (⛓). The Hero and Nanami are siblings. Place Nanami next to the Hero, under the enemy card. Three or four bonded cards in the right shape trigger a Unite Attack once per duel: a free flip of the weakest touching enemy.',
+    text: 'Bonded Stars get +1 on all sides while they touch an ally partner (⛓). The Hero and Nanami are siblings. Place Nanami next to the Hero, under the enemy card.',
     rules: { bonds: true },
     board: [[3, 'hero', [5, 5, 5, 5], 0], [1, 'zamza', [6, 6, 6, 6], 1]],
     hand: [['nanami', [6, 3, 3, 3]]],
     goal: 'basic',
     success: 'With her brother beside her, Nanami\'s 6 became 7. Bonds cost deck slots, so choose them with care.',
+  },
+  {
+    title: 'Formations: Unite Attack',
+    text: 'Some bonds are groups of 3 or 4 Stars with a shape: a Line (one straight row or column), a Group (all touching, any shape), or a Square (2×2). Complete the shape on the board for a Unite Attack: once per duel, it flips the weakest enemy card that touches the formation. Gengen and Gabocha are yours. Ridley completes the Kobold Army line.',
+    rules: { bonds: true, unite: true },
+    board: [[0, 'gengen', [3, 3, 3, 3], 0], [1, 'gabocha', [3, 3, 3, 3], 0], [3, 'zamza', [9, 9, 9, 9], 1], [4, 'rikimaru', [9, 9, 9, 9], 1], [5, 'anita', [3, 9, 9, 9], 1]],
+    hand: [['ridley', [1, 1, 1, 1]]],
+    goal: 'unite',
+    success: 'Unite Attack! The formation flipped the enemy card with the weakest touching side (Anita\'s 3), even though Ridley\'s values are low.',
   },
   {
     title: 'Abilities: Steadfast',

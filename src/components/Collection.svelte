@@ -7,7 +7,9 @@
   import type { CardDef } from '../core/types';
   import { CARDS } from '../data/cards';
   import { openRegions, save } from '../stores/save.svelte';
+  import { SHAPES, UNITE_TEXT } from '../data/formations';
   import Card from './Card.svelte';
+  import ShapeIcon from './ShapeIcon.svelte';
   import RuneIcon from './RuneIcon.svelte';
 
   let filter = $state<'all' | 'heavenly' | 'earthly' | 'missing'>('all');
@@ -83,7 +85,12 @@
             <strong>Bonds</strong>
             <ul>
               {#each bonds as b}
-                <li>{b.name}{b.shape ? ` (formation, ${b.shape})` : ''}: {b.members.filter((m) => m !== open!.id).map((m) => (owned.has(m) ? CARDS.find((x) => x.id === m)?.name : '???')).join(', ')}</li>
+                <li>
+                  {b.name}: {b.members.filter((m) => m !== open!.id).map((m) => (owned.has(m) ? CARDS.find((x) => x.id === m)?.name : '???')).join(', ')}
+                  {#if b.shape}
+                    <div class="muted">Formation <ShapeIcon shape={b.shape} /> {SHAPES[b.shape].name}: {SHAPES[b.shape].text} {UNITE_TEXT}</div>
+                  {/if}
+                </li>
               {/each}
             </ul>
           </div>

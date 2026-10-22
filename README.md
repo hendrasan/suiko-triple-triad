@@ -39,7 +39,7 @@ Card and opponent art is in `public/portraits/<file>.webp`. The default file nam
 - **Combo**: cards flipped by Same or Plus attack their neighbors with the basic rule, and the chain continues.
 - **Rune tiles**: matching rune +1 on all sides, other rune −1. Values stay in 1–10.
 - **Bonds**: a card that touches an allied bond partner gets +1 on **all** sides (one bonus at most). See assumption 1.
-- **Unite Attack**: when a formation (3–4 bonded cards in the bond's shape) is complete, the owner flips the adjacent enemy card with the lowest touching value. Once per duel per side. No chain.
+- **Unite Attack**: when a formation (3–4 bonded cards in the bond's shape) is complete, the owner flips the adjacent enemy card with the lowest touching value. Once per duel per side. No chain. Shapes: **Line** (one straight row or column), **Group** (`connected` in data: all touching, any shape), **Square** (2×2). Player-facing text is in `src/data/formations.ts`.
 - **Abilities** (20 Earthly Stars, icon in the bottom-left corner of the card). A card with an ability has 2 fewer stat points (`abilityStatCost`).
   - **Steadfast** (Hans, Gantetsu, Barbara, Maximillian, Gadget): Same, Plus, and Combo cannot flip it. Normal flips and Unite Attacks can.
   - **Rally** (Leona, Annallee, Connell, Huan, Apple): allied cards next to it get +1 on all sides (at most +1). The bonus follows the card's current owner.

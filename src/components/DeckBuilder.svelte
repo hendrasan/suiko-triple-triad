@@ -6,7 +6,9 @@
   import { SLOTS, defaultDeck } from '../stores/saveData';
   import { deckCost, deckProblem, persist, save } from '../stores/save.svelte';
   import { cap } from '../lib/text';
+  import { SHAPES, UNITE_TEXT } from '../data/formations';
   import Card from './Card.svelte';
+  import ShapeIcon from './ShapeIcon.svelte';
   import RuneIcon from './RuneIcon.svelte';
 
   let { initialMode }: { initialMode?: BoardSize } = $props();
@@ -105,7 +107,8 @@
           <div class="bond small">
             <span class="link">⛓</span> <strong>{b.name}</strong>
             {#if b.shape}
-              <span class="muted">· Formation ({b.shape}) {have.length}/{b.members.length}{have.length === b.members.length ? ' ✓' : ''}</span>
+              <span class="muted">· Formation <ShapeIcon shape={b.shape} /> {SHAPES[b.shape].name} {have.length}/{b.members.length}{have.length === b.members.length ? ' ✓' : ''}</span>
+              <div class="muted form-help">{SHAPES[b.shape].text} {UNITE_TEXT}</div>
             {/if}
           </div>
         {/each}
@@ -155,6 +158,7 @@
   .warn { color: var(--danger); margin: 0; }
   .bonds { display: grid; gap: 4px; }
   .link { color: var(--gold-2); }
+  .form-help { margin: 2px 0 4px 1.4em; font-size: 0.8rem; }
   .filters label { display: flex; flex-direction: column; gap: 2px; color: var(--muted); }
   select {
     min-height: 40px; border-radius: 8px; background: var(--panel); color: var(--text);

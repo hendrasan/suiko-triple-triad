@@ -1,6 +1,7 @@
 <script lang="ts">
   import { CONFIG } from '../core/config';
-  import { hintFor } from '../core/progress';
+  import { hintFor, secretsOpen } from '../core/progress';
+  import { REPORTS } from '../data/reports';
   import { cap } from '../lib/text';
   import { ABILITIES } from '../data/abilities';
   import { BONDS } from '../data/bonds';
@@ -26,6 +27,12 @@
       : (c.starNo ?? 0) > 36,
     ),
   );
+  const hasRichmond = $derived(owned.has('richmond'));
+  const wins = (id: string) => save.cardWins[id] ?? 0;
+  const secretsTotal = CARDS.reduce((a, c) => a + REPORTS[c.id].secrets.length, 0);
+  const secretsFound = $derived(
+    save.owned.reduce((a, id) => a + secretsOpen(REPORTS[id]?.secrets.length ?? 0, wins(id), hasRichmond), 0),
+  );
   const VIA: Record<string, string> = { starter: 'Starter', prize: 'Duel prize', quest: 'Recruit quest', bond: 'Bond recruit', story: 'Story' };
 
   function show(c: CardDef) {
@@ -39,6 +46,9 @@
     <h1 style="margin:0; flex:1">The 108 Stars</h1>
     <span class="muted small">{save.owned.length} of {CARDS.length}</span>
   </div>
+  {#if hasRichmond}
+    <p class="muted small" style="margin:0">🔍 Richmond's reports: {secretsFound} of {secretsTotal} secrets found. Win duels with a Star in your deck to learn more.</p>
+  {/if}
   <div class="row" role="radiogroup" aria-label="Filter">
     {#each [['all', 'All'], ['heavenly', 'Heavenly'], ['earthly', 'Earthly'], ['missing', 'Missing']] as [k, label]}
       <button class="btn small" class:primary={filter === k} role="radio" aria-checked={filter === k} onclick={() => (filter = k as typeof filter)}>{label}</button>
@@ -95,6 +105,32 @@
             </ul>
           </div>
         {/if}
+        <section class="report">
+          <h3>🔍 Richmond's Report</h3>
+          {#if !hasRichmond}
+            <p class="muted small">Recruit Richmond, the detective of South Window, and he will investigate your Stars.</p>
+          {:else}
+            {@const r = REPORTS[open.id]}
+            {@const n = secretsOpen(r.secrets.length, wins(open.id), true)}
+            <dl class="profile small">
+              <dt>Age</dt><dd>{r.age}</dd>
+              <dt>From</dt><dd>{r.from}</dd>
+              <dt>Position</dt><dd>{r.position}</dd>
+              {#if r.note}<dt>Note</dt><dd>{r.note}</dd>{/if}
+            </dl>
+            <ol class="secrets small">
+              {#each r.secrets as text, i}
+                {#if i < n}
+                  <li>“{text}”</li>
+                {:else}
+                  {@const need = i + 1 - wins(open.id)}
+                  <li class="locked">🔒 Win {need} more {need === 1 ? 'duel' : 'duels'} with {open.name} in your deck.</li>
+                {/if}
+              {/each}
+            </ol>
+            {#if r.flag}<p class="flag small">Report note: {r.flag}</p>{/if}
+          {/if}
+        </section>
         {#if open.flag}<p class="flag small">Roster note: {open.flag}</p>{/if}
       {:else}
         <h2>{open.starNo ? `Star ${open.starNo}` : 'Unknown Star'}</h2>
@@ -114,7 +150,7 @@
   }
   dialog {
     border: 1px solid var(--line); border-radius: 16px; background: var(--panel); color: var(--text);
-    width: min(92vw, 400px); padding: 20px;
+    width: min(92vw, 400px); padding: 20px; max-height: 90dvh; overflow: auto;
   }
   dialog::backdrop { background: rgb(0 0 0 / 0.7); }
   .big { width: 180px; margin: 0 auto; }
@@ -122,5 +158,12 @@
   .detail p { margin: 0; }
   .detail ul { margin: 4px 0 0; padding-left: 1.2em; }
   .ability { border-left: 3px solid #c8a6ff; padding-left: 8px; }
+  .report { border-top: 1px solid var(--line); padding-top: 10px; }
+  .report h3 { margin: 0 0 6px; }
+  .profile { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; margin: 0 0 8px; }
+  .profile dt { color: var(--muted); }
+  .profile dd { margin: 0; }
+  .secrets { margin: 0; padding-left: 1.4em; display: grid; gap: 6px; }
+  .secrets .locked { color: var(--muted); list-style: none; margin-left: -1.4em; }
   .flag { color: var(--gold); border-left: 3px solid var(--gold); padding-left: 8px; }
 </style>

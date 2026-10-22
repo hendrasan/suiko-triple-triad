@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { newLog, setupGame, summarize, type MatchSummary } from '../src/core/match';
-import { bondRecruits, prizeOptions, recruitsFromMatch } from '../src/core/progress';
+import { bondRecruits, prizeOptions, recruitsFromMatch, secretsOpen } from '../src/core/progress';
 import { OPPONENT_BY_ID } from '../src/data/opponents';
 import { STARTERS } from '../src/data/recruits';
 import { migrate, newSave, SAVE_VERSION } from '../src/stores/saveData';
@@ -85,6 +85,15 @@ describe('recruiting', () => {
   });
 });
 
+describe('Richmond\'s Investigations', () => {
+  it('opens one secret per win, only after Richmond joins', () => {
+    expect(secretsOpen(3, 2, false)).toBe(0);
+    expect(secretsOpen(3, 0, true)).toBe(0);
+    expect(secretsOpen(3, 2, true)).toBe(2);
+    expect(secretsOpen(2, 9, true)).toBe(2);
+  });
+});
+
 describe('save data', () => {
   it('round-trips and repairs', () => {
     const s = newSave();
@@ -102,6 +111,7 @@ describe('save data', () => {
     expect(m.version).toBe(SAVE_VERSION);
     expect(m.settings.sound).toBe(true);
     expect(m.settings.skipAnimations).toBe(true);
+    expect(m.cardWins).toEqual({}); // new field is filled with its default
   });
 
   it('rejects newer versions and non-saves', () => {

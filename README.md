@@ -50,6 +50,10 @@ Card and opponent art is in `public/portraits/<file>.webp`. The default file nam
 - **Parity**: casual 4×4 duels give +1 to one card of the first player (the second player gets the last move). Casual 3×3 duels have no handicap. Bosses play best of two: you must win both games (the first player switches). After a game 1 draw or loss, the match ends: a draw or a defeat.
 - Hands are hidden. The AI sees face-down stand-ins (5/5/5/5) for your cards.
 
+## Richmond's Investigations
+
+Recruit Richmond (the detective, a quest recruit in South Window & Two River) to read a report on each Star in the Stars screen: a profile and 1–3 secrets. One secret opens for each won duel with that card in your deck (wins before Richmond joins also count). The text is in `src/data/reports.ts`. It is rewritten a little from the Suikoden II reports. The Hero, Jowy, and Luca have no game report, so theirs are written from general knowledge. Lines about war-battle abilities were dropped or turned into lore.
+
 ## Progression
 
 - 6 regions, 18 opponents (one boss per region). A region opens when you beat the previous boss **or** own enough cards.

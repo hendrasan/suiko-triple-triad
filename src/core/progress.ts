@@ -109,3 +109,8 @@ export function rumors(owned: Set<string>, openRegions: Set<string>): { id: stri
   }
   return out;
 }
+
+/** Richmond's Investigations: secrets open one per won duel with the card in the deck, once Richmond has joined. */
+export function secretsOpen(total: number, wins: number, hasRichmond: boolean): number {
+  return hasRichmond ? Math.min(total, wins) : 0;
+}

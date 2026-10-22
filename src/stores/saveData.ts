@@ -25,6 +25,8 @@ export interface SaveData {
   activeSlot: Record<BoardSize, number>;
   /** Opponent id -> wins per mode. */
   beaten: Record<string, Record<BoardSize, number>>;
+  /** Card id -> won matches with that card in the deck (opens Richmond's secrets). */
+  cardWins: Record<string, number>;
   stats: { duels: number; wins: number };
   tutorialDone: boolean;
   settings: Settings;
@@ -61,6 +63,7 @@ export function newSave(): SaveData {
     },
     activeSlot: { 3: 0, 4: 0 },
     beaten: {},
+    cardWins: {},
     stats: { duels: 0, wins: 0 },
     tutorialDone: false,
     settings: { skipAnimations: false, sound: true, music: true, reducedMotion: 'auto' },

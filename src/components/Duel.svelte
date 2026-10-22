@@ -7,7 +7,8 @@
     aiBoostPick, boostCard, newLog, opponentDeck, record, setupGame, summarize, tilesFor,
     type GameLog, type GameSetup, type MatchSummary,
   } from '../core/match';
-  import { bondRecruits, prizeOptions, recruitsFromMatch, type Recruit } from '../core/progress';
+  import { bondRecruits, prizeOptions, recruitsFromMatch, secretsOpen, type Recruit } from '../core/progress';
+  import { REPORTS } from '../data/reports';
   import { makeRng } from '../core/rng';
   import type { BoardSize, FlipCause, GameState, Move, Side } from '../core/types';
   import { BONDS } from '../data/bonds';
@@ -62,6 +63,8 @@
   let joined = $state<Recruit[]>([]);
   let prizeChoices = $state<string[]>([]);
   let prizeDone = $state(true);
+  /** Cards that opened a new Richmond secret with this win. */
+  let newSecrets: string[] = $state([]);
 
   let alive = true;
   onDestroy(() => (alive = false));
@@ -190,6 +193,13 @@
       save.stats.wins++;
       save.beaten[opp.id] ??= { 3: 0, 4: 0 };
       save.beaten[opp.id][mode]++;
+      const richmond = save.owned.includes('richmond');
+      for (const id of deck) {
+        const total = REPORTS[id]?.secrets.length ?? 0;
+        const before = secretsOpen(total, save.cardWins[id] ?? 0, richmond);
+        save.cardWins[id] = (save.cardWins[id] ?? 0) + 1;
+        if (secretsOpen(total, save.cardWins[id], richmond) > before) newSecrets.push(id);
+      }
       const found = recruitsFromMatch(ownedSet(), s);
       for (const r of found) addCard(r.id, r.via);
       joined = found;
@@ -467,6 +477,10 @@
           {#if summary.flawless && summary.won}<li>Flawless: no card lost</li>{/if}
         </ul>
 
+        {#if newSecrets.length}
+          <p class="small secrets">🔍 Richmond found new secrets about {newSecrets.map((id) => CARD_BY_ID[id].name).join(', ')}. Read them on the Stars screen.</p>
+        {/if}
+
         {#if !prizeDone}
           <h3>Choose a prize</h3>
           <p class="muted small">Tap a card to keep it. If you leave now, you get the strongest one.</p>
@@ -575,6 +589,7 @@
   .facts { margin: 0; padding-left: 1.2em; color: var(--muted); }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 10px; }
   .pick { padding: 0; border: 0; background: none; }
+  .secrets { margin: 0; color: var(--gold-2); }
   /* Pinned to the bottom of the dialog, so the exits are always visible. */
   .actions {
     position: sticky; bottom: -16px; margin: 0 -16px -16px; padding: 12px 16px 16px;

@@ -6,6 +6,7 @@ import { BONDS } from './bonds';
 import { CARD_BY_ID, CARDS } from './cards';
 import { OPPONENT_BY_ID, OPPONENTS, REGIONS } from './opponents';
 import { BOND_RECRUITS, QUESTS, STARTERS, STORY_GATES } from './recruits';
+import { REPORTS } from './reports';
 import type { Cond, OpponentDef } from './schema';
 
 export function checkBudgets(): string[] {
@@ -72,6 +73,13 @@ export function checkIntegrity(): string[] {
   }
   for (const b of BOND_RECRUITS) for (const id of [b.card, ...b.requires]) if (!has(id)) errs.push(`Bond recruit: unknown ${id}`);
   for (const g of STORY_GATES) if (!has(g.card) || !OPPONENT_BY_ID[g.boss]) errs.push(`Story gate ${g.card} broken`);
+  for (const c of CARDS) {
+    const r = REPORTS[c.id];
+    if (!r) errs.push(`${c.id}: no Richmond report`);
+    else if (r.secrets.length < 1 || r.secrets.length > 3) errs.push(`${c.id}: report needs 1-3 secrets`);
+  }
+  for (const id of Object.keys(REPORTS)) if (!has(id)) errs.push(`Report for unknown card ${id}`);
+  if (!has('richmond')) errs.push('Richmond card is missing (Investigations need him)');
   return errs;
 }
 

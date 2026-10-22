@@ -71,8 +71,8 @@
   .head { flex-wrap: nowrap; gap: 14px; }
   .mode .btn { flex: 1; }
   .board-prev { max-width: 240px; }
-  .deck { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; max-width: 420px; }
-  .deck.s4 { grid-template-columns: repeat(8, 1fr); max-width: 640px; }
-  @media (max-width: 520px) { .deck.s4 { grid-template-columns: repeat(4, 1fr); } }
+  .deck { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; max-width: 420px; }
+  .deck.s4 { grid-template-columns: repeat(8, minmax(0, 1fr)); max-width: 640px; }
+  @media (max-width: 520px) { .deck.s4 { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
   .warn { color: var(--danger); margin: 8px 0 0; }
 </style>

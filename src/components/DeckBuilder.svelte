@@ -144,10 +144,12 @@
 
 <style>
   .spacer { flex: 1; }
-  .deck { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-  .deck.s4 { grid-template-columns: repeat(4, 1fr); }
-  @media (min-width: 720px) { .deck.s4 { grid-template-columns: repeat(8, 1fr); } }
-  .slotcard, .poolcard { padding: 0; border: 0; background: none; position: relative; }
+  /* minmax(0, 1fr): columns stay equal and never grow wider than the panel. */
+  .deck { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; align-items: start; }
+  .deck.s4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  @media (min-width: 720px) { .deck.s4 { grid-template-columns: repeat(8, minmax(0, 1fr)); } }
+  /* width: 100% — a button shrinks to its content, and the card inside sizes to the button. */
+  .slotcard, .poolcard { width: 100%; padding: 0; border: 0; background: none; position: relative; }
   .empty { aspect-ratio: 1; border: 2px dashed var(--line); border-radius: 10px; }
   .chip.bad { color: var(--danger); border-color: var(--danger); }
   .warn { color: var(--danger); margin: 0; }

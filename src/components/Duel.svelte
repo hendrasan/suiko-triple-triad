@@ -542,11 +542,11 @@
 
   .status { grid-area: status; min-height: 2.6em; margin: 0; text-align: center; font-size: 0.9rem; color: var(--muted); }
 
-  .my-hand { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
-  .s4 .my-hand { grid-template-columns: repeat(4, 1fr); }
+  .my-hand { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+  .s4 .my-hand { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .my-hand.boosting .hand-card { animation: glow 1.2s ease-in-out infinite alternate; border-radius: 10px; }
   @keyframes glow { from { box-shadow: 0 0 0 0 transparent; } to { box-shadow: 0 0 0 3px var(--gold); } }
-  .hand-card { position: relative; padding: 0; border: 0; background: none; min-height: var(--tap); touch-action: none; }
+  .hand-card { position: relative; width: 100%; padding: 0; border: 0; background: none; min-height: var(--tap); touch-action: none; }
   .hand-card.lifted { opacity: 0.3; }
   .drag-ghost {
     position: fixed; z-index: 30; pointer-events: none;
@@ -597,6 +597,6 @@
     .my-side { align-items: stretch; }
     .opp-hand { flex-direction: column; align-items: center; }
     .mini { width: 64px; }
-    .my-hand, .s4 .my-hand { grid-template-columns: repeat(2, 1fr); }
+    .my-hand, .s4 .my-hand { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
 </style>

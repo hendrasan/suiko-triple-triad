@@ -104,12 +104,24 @@
     {#if bonds.length}
       <div class="bonds">
         {#each bonds as { b, have }}
-          <div class="bond small">
-            <span class="link">⛓</span> <strong>{b.name}</strong>
-            {#if b.shape}
-              <span class="muted">· Formation <ShapeIcon shape={b.shape} /> {SHAPES[b.shape].name} {have.length}/{b.members.length}{have.length === b.members.length ? ' ✓' : ''}</span>
-              <div class="muted form-help">{SHAPES[b.shape].text} {UNITE_TEXT}</div>
-            {/if}
+          {@const ready = have.length === b.members.length}
+          {@const missing = b.members.filter((m) => !have.includes(m))}
+          <div class="bond small" class:inactive={!ready}>
+            <div class="bond-head">
+              <span class="link">⛓</span> <strong>{b.name}</strong>
+              {#if b.shape}<span class="muted">· Formation <ShapeIcon shape={b.shape} /> {SHAPES[b.shape].name} {have.length}/{b.members.length}</span>{/if}
+              <span class="status" class:ok={ready}>{ready ? 'Ready' : 'Not ready'}</span>
+            </div>
+            <div class="muted form-help">
+              {#if !b.shape}
+                +1 on all sides while these cards touch on the board.
+              {:else if ready}
+                {SHAPES[b.shape].text} {UNITE_TEXT}
+              {:else}
+                Add {missing.map((m) => (save.owned.includes(m) ? CARD_BY_ID[m].name : 'an unknown Star')).join(' and ')} to enable the Unite Attack.
+                Members in the deck still get +1 when they touch. Shape: {SHAPES[b.shape].text}
+              {/if}
+            </div>
           </div>
         {/each}
       </div>
@@ -158,7 +170,15 @@
   .warn { color: var(--danger); margin: 0; }
   .bonds { display: grid; gap: 4px; }
   .link { color: var(--gold-2); }
+  .bond-head { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
   .form-help { margin: 2px 0 4px 1.4em; font-size: 0.8rem; }
+  .status {
+    margin-left: auto; padding: 1px 8px; border-radius: 999px; font-size: 0.72rem; font-weight: 700;
+    border: 1px solid var(--line); color: var(--muted);
+  }
+  .status.ok { border-color: var(--ok); color: var(--ok); }
+  .bond.inactive strong { color: var(--muted); }
+  .bond.inactive .link { color: var(--muted); }
   .filters label { display: flex; flex-direction: column; gap: 2px; color: var(--muted); }
   select {
     min-height: 40px; border-radius: 8px; background: var(--panel); color: var(--text);

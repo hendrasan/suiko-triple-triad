@@ -22,6 +22,8 @@ export interface CardDef {
   /** Stone Tablet position 1..108. Absent for non-Star cards (Jowy, Luca). */
   starNo?: number;
   starName?: string;
+  /** Number 109+ for extra cards that are not one of the 108 (Kasumi, Sigfried, ...). */
+  extraNo?: number;
   rarity: Rarity;
   values: Values;
   rune: Rune;

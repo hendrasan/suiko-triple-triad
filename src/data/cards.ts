@@ -22,9 +22,9 @@ const STARS: Row[] = [
   [9, 'Tenei', 'sierra', 'Sierra', '6 9 3 8', W, 'Ancestress of vampires. Graceful and deadly.'],
   [10, 'Tenki', 'teresa', 'Teresa', '5 6 6 6', W, 'Acting mayor of Greenhill. Calm under pressure.'],
   [11, 'Tenfu', 'nina', 'Nina', '4 7 5 6', F, 'New Leaf Academy student. Chases Flik everywhere.'],
-  [12, 'Tenman', 'feather', 'Feather', '6 8 2 7', Wi, 'Griffin saved in the Forest Village.', 'Tenman/Tentai go to two of Feather, Siegfried, Abizboah. Feather + Abizboah used here.'],
+  [12, 'Tenman', 'feather', 'Feather', '6 8 2 7', Wi, 'Griffin saved in the Forest Village.', 'In the game, Tenman/Tentai go to two of Feather, Sigfried, and Abizboah. Here Feather and Abizboah hold them, and Sigfried is extra card 110.'],
   [13, 'Tenko', 'viktor', 'Viktor', '9 6 3 7', E, 'Bear of a mercenary. Hits hard, laughs loud.'],
-  [14, 'Tensho', 'valeria', 'Valeria', '7 7 6 5', F, 'Falcon swordswoman of the Toran Republic.', 'Valeria or Kasumi is a player choice. Valeria used here; Tomo takes Chikyuu.'],
+  [14, 'Tensho', 'valeria', 'Valeria', '7 7 6 5', F, 'Falcon swordswoman of the Toran Republic.', 'In the game, Valeria or Kasumi joins. Here both join: Kasumi is an extra card.'],
   [15, 'Tenritsu', 'fitcher', 'Fitcher', '3 7 7 5', Wi, 'Diplomat of Matilda. Talks his way through.'],
   [16, 'Tensho', 'clive', 'Clive', '9 2 4 8', F, 'Gunner of the Howling Voice Guild. Long reach.'],
   [17, 'Tenan', 'flik', 'Flik', '7 6 5 7', L, 'The Blue Lightning. Balanced and reliable.'],
@@ -70,7 +70,7 @@ const STARS: Row[] = [
   [56, 'Chirei', 'huan', 'Huan', '4 4 6 4', W, 'Doctor of the alliance.'],
   [57, 'Chijuu', 'tuta', 'Tuta', '3 4 5 4', W, 'Huan\'s apprentice. Runs everywhere.'],
   [58, 'Chibi', 'futch', 'Futch', '6 5 3 5', Wi, 'Dragon knight without a dragon.'],
-  [59, 'Chikyuu', 'tomo', 'Tomo', '5 4 4 5', Wi, 'Tsai\'s daughter. Wind runes and a spear.', 'Kasumi takes this star if chosen instead of Valeria.'],
+  [59, 'Chikyuu', 'tomo', 'Tomo', '5 4 4 5', Wi, 'Tsai\'s daughter. Wind runes and a spear.', 'In the game, Kasumi can take this star. Here Kasumi is an extra card.'],
   [60, 'Chibaku', 'badeaux', 'Badeaux', '4 3 6 5', E, 'Beast tamer of the forest.'],
   [61, 'Chizen', 'mazus', 'Mazus', '7 2 2 7', F, 'Sorcerer of the Tinto Mines. Dangerous.'],
   [62, 'Chikou', 'mondo', 'Mondo', '5 5 4 4', L, 'Rokkaku ninja. Patient.'],
@@ -130,6 +130,7 @@ const ABILITY: Record<string, Ability> = {
   leona: 'rally', annallee: 'rally', connell: 'rally', huan: 'rally', apple: 'rally',
   hoi: 'sabotage', shilo: 'sabotage', sasuke: 'sabotage', koyu: 'sabotage', 'lo-wen': 'sabotage',
   jeane: 'runeborn', mazus: 'runeborn', lorelai: 'runeborn', tomo: 'runeborn', tetsu: 'runeborn',
+  kasumi: 'sabotage', chuchara: 'runeborn', rulodia: 'steadfast',
 };
 
 function rarityOf(no: number, id: string): Rarity {
@@ -137,10 +138,24 @@ function rarityOf(no: number, id: string): Rarity {
   return no <= 36 ? 'rare' : 'common';
 }
 
+// Extra cards 109+: characters that are not one of the 108 here, but have a Richmond report in the game.
+type Extra = [no: number, id: string, name: string, rarity: Rarity, values: string, rune: Rune, blurb: string, flag: string];
+const EXTRAS: Extra[] = [
+  [109, 'kasumi', 'Kasumi', 'common', '5 4 4 5', Wi, 'Ninja of Rokkaku Hamlet. Quiet, quick, and loyal.', 'In the game she takes Star 59 (Chikyuu) if chosen over Valeria.'],
+  [110, 'sigfried', 'Sigfried', 'rare', '7 6 5 6', W, 'Unicorn of the deep forest. Only maidens may come near.', 'In the game he shares the Tenman/Tentai stars with Feather and Abizboah.'],
+  [111, 'chuchara', 'Chuchara', 'common', '3 4 3 4', W, 'Abizboah\'s newborn. Small, slippery, and much loved.', 'Not one of the 108. Abizboah\'s family.'],
+  [112, 'rulodia', 'Rulodia', 'common', '6 4 5 3', W, 'Abizboah\'s wife. Guards the mine pool and her little one.', 'Not one of the 108. Abizboah\'s family.'],
+];
+
+const STAR_CARDS = STARS.map(([no, star, id, name, v, rune, blurb, flag]): CardDef => ({
+  id, name, starNo: no, starName: star, rarity: rarityOf(no, id), values: parse(v), rune, ability: ABILITY[id], blurb,
+  flag,
+}));
+
 export const CARDS: CardDef[] = [
-  ...STARS.map(([no, star, id, name, v, rune, blurb, flag]): CardDef => ({
-    id, name, starNo: no, starName: star, rarity: rarityOf(no, id), values: parse(v), rune, ability: ABILITY[id], blurb,
-    flag,
+  ...STAR_CARDS,
+  ...EXTRAS.map(([no, id, name, rarity, v, rune, blurb, flag]): CardDef => ({
+    id, name, extraNo: no, rarity, values: parse(v), rune, ability: ABILITY[id], blurb, flag,
   })),
   { id: 'jowy', name: 'Jowy', rarity: 'special', values: [8, 6, 7, 7], rune: L, blurb: 'The Hero\'s best friend. Bearer of the Black Sword Rune.', flag: 'Not one of the 108. Story card.' },
   { id: 'luca', name: 'Luca Blight', rarity: 'boss', values: [10, 9, 3, 8], rune: F, blurb: 'Mad prince of Highland. Pure destruction.', flag: 'Not one of the 108. Story card.' },

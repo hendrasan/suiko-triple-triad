@@ -493,6 +493,34 @@ export const REPORTS: Record<string, Report> = {
       'He says Hanzo ordered him here. Truth is, he likes being out in the real world.',
     ],
   },
+  kasumi: {
+    age: '19', from: 'Rokkaku Hamlet', position: 'Volunteer Army General', note: 'Vice-Chancellor of Rokkaku Hamlet',
+    secrets: [
+      'She was born and raised in Rokkaku like the other ninja. Maybe that\'s why she knows so little about the outside world.',
+      'Every so often she slips off to Banner Village. A sweetheart there, maybe?',
+    ],
+  },
+  sigfried: {
+    age: '170', from: 'Two River City', position: '—',
+    secrets: [
+      'Now I\'m investigating horses with horns. Deep in the forest, between two trees, there\'s a place called Unicorn Village.',
+      'I like his style, I admit it. He only cares about girls. Won\'t waste a minute on us guys.',
+      'He took Sierra for a maiden the other day and walked right up to her. You should have seen him once he got a whiff.',
+    ],
+  },
+  rulodia: {
+    age: '68', from: 'Mining cavern in Tinto', position: 'Navy',
+    secrets: [
+      'How should I know? Octopi! I\'m sick of octopi!',
+      'I thought... I thought I saw a baby octopus.',
+    ],
+  },
+  chuchara: {
+    age: '1', from: 'Unknown', position: 'Navy',
+    secrets: [
+      'Just born, and raised with lots of love. Probably.',
+    ],
+  },
   mondo: {
     age: '35', from: 'Rokkaku Hamlet', position: 'Infantry',
     secrets: [

@@ -67,7 +67,7 @@ Recruit Richmond (the detective, a quest recruit in South Window & Two River) to
 3. **Unite Attack** flips the enemy card with the lowest touching value (ties: lowest total, then board order).
 4. **"Win without losing a card"** means the opponent never flipped any of your cards in the match.
 5. **Losing a duel costs no cards.** Only the winner claims a prize.
-6. **108 Stars + 2 story cards = 110 cards.** No alternates. The Hero is 'special' (cost 5) but stays Star 1.
+6. **108 Stars + 4 extra cards (109 Kasumi, 110 Sigfried, 111 Chuchara, 112 Rulodia) + 2 story cards (Jowy, Luca) = 114 cards.** In the game, Kasumi and Sigfried are alternates for a star slot; Chuchara and Rulodia are Abizboah's family. Boris is not a card. The Hero is 'special' (cost 5) but stays Star 1.
 7. **Rune affinities** are game design, not canon.
 8. **Opponents in Triple Triad** use a seeded 5 of their 8 cards.
 9. **Tavern** shows 3 rumors, plus one more per win.

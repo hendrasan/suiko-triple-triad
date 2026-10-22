@@ -53,6 +53,8 @@ export const QUESTS: QuestDef[] = [
   { card: 'valeria', hint: 'The Falcon swordswoman respects two flips at once with two Fire cards in hand.', conds: [{ t: 'flips', n: 2 }, { t: 'withRune', rune: 'fire', n: 2 }] },
   { card: 'sheena', hint: 'A charmer follows the treasure hunter.', conds: [{ t: 'withCard', id: 'lorelai' }] },
   { card: 'lorelai', hint: 'A treasure hunter lights the way with Fire tiles in Matilda.', conds: [{ t: 'runeTile', rune: 'fire' }, { t: 'region', id: 'rockaxe' }] },
+  { card: 'sigfried', hint: 'A unicorn walks the Path of the Maidens in Matilda. He only comes near a pure heart: win there with Nina in your hand.', conds: [{ t: 'region', id: 'rockaxe' }, { t: 'withCard', id: 'nina' }] },
+  { card: 'kasumi', hint: 'A ninja of Rokkaku comes home to her own. Win with both Rokkaku ninja in your hand.', conds: [{ t: 'withCard', id: 'mondo' }, { t: 'withCard', id: 'sasuke' }] },
   { card: 'sasuke', hint: 'The young ninja never leaves his senior behind.', conds: [{ t: 'withCard', id: 'mondo' }] },
   { card: 'killey', hint: 'A wanderer asks about the treasure seeker of South Window.', conds: [{ t: 'withCard', id: 'alex' }] },
   { card: 'karen', hint: 'A dancer joins whoever moves like the wind: two Wind cards and a win.', conds: [{ t: 'withRune', rune: 'wind', n: 2 }, { t: 'region', id: 'tinto' }] },
@@ -100,6 +102,8 @@ export const BOND_RECRUITS: BondRecruitDef[] = [
   { card: 'tengaar', requires: ['hix'], hint: 'She says she only came to keep an eye on him.' },
   { card: 'kahn', requires: ['sierra'], hint: 'A vampire hunter tracks the ancestress.' },
   { card: 'marlowe', requires: ['emilia', 'jude'], hint: 'A writer comes for the library and the statues.' },
+  { card: 'rulodia', requires: ['abizboah'], hint: 'Something big lives in the Tinto mine pool. It may not live alone.' },
+  { card: 'chuchara', requires: ['rulodia'], hint: 'A little one hides behind its mother in the mine pool.' },
   { card: 'hai-yo', requires: ['tetsu', 'barbara'], hint: 'A chef opens a kitchen when the castle has a bath and a warehouse.' },
 ];
 

@@ -117,7 +117,7 @@ export const OPPONENTS: OpponentDef[] = [
   {
     id: 'trader', name: 'Gregminster Trader', title: 'Gregminster', region: 'tinto',
     intro: 'Old Toran money. Plays for profit.',
-    deck: ['gordon', 'lorelai', 'mondo', 'sasuke', 'tomo', 'bob', 'annallee', 'karen'],
+    deck: ['gordon', 'lorelai', 'mondo', 'sasuke', 'tomo', 'bob', 'annallee', 'kasumi'],
     rules: rules({ same: true, plus: true }), format: 'single', prize: 'highest', difficulty: 'hard', personality: 'balanced',
     tiles: { 3: [[0, 'wind'], [8, 'lightning']], 4: [[0, 'wind'], [3, 'lightning'], [12, 'lightning'], [15, 'wind']] }, faction: 'neutral',
   },

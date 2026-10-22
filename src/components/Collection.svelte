@@ -23,8 +23,8 @@
     CARDS.filter((c) =>
       filter === 'all' ? true
       : filter === 'missing' ? !owned.has(c.id)
-      : filter === 'heavenly' ? (c.starNo ?? 99) <= 36
-      : (c.starNo ?? 0) > 36,
+      : filter === 'heavenly' ? (c.starNo ? c.starNo <= 36 : !!c.extraNo && c.rarity !== 'common')
+      : c.starNo ? c.starNo > 36 : !!c.extraNo && c.rarity === 'common',
     ),
   );
   const hasRichmond = $derived(owned.has('richmond'));
@@ -58,8 +58,8 @@
   <div class="grid">
     {#each list as c (c.id)}
       {@const have = owned.has(c.id)}
-      <button class="cell" data-sfx="open" onclick={() => show(c)} aria-label={have ? c.name : `Unknown Star ${c.starNo ?? ''}`}>
-        <span class="no">{c.starNo ?? '✦'}</span>
+      <button class="cell" data-sfx="open" onclick={() => show(c)} aria-label={have ? c.name : `Unknown Star ${c.starNo ?? c.extraNo ?? ''}`}>
+        <span class="no">{c.starNo ?? c.extraNo ?? '✦'}</span>
         <Card id={c.id} silhouette={!have} showName />
       </button>
     {/each}
@@ -74,7 +74,8 @@
       {#if have}
         <h2>{open.name}</h2>
         <p class="muted small">
-          {open.starNo ? `Star ${open.starNo} · ${open.starName} Star · ${open.starNo <= 36 ? 'Heavenly' : 'Earthly'}` : 'Story card'}
+          {open.starNo ? `Star ${open.starNo} · ${open.starName} Star · ${open.starNo <= 36 ? 'Heavenly' : 'Earthly'}`
+            : open.extraNo ? `No. ${open.extraNo} · Extra card · ${open.rarity === 'common' ? 'Earthly' : 'Heavenly'}` : 'Story card'}
         </p>
         <p>{open.blurb}</p>
         <div class="row small">
@@ -133,7 +134,7 @@
         </section>
         {#if open.flag}<p class="flag small">Roster note: {open.flag}</p>{/if}
       {:else}
-        <h2>{open.starNo ? `Star ${open.starNo}` : 'Unknown Star'}</h2>
+        <h2>{open.starNo ? `Star ${open.starNo}` : open.extraNo ? `No. ${open.extraNo}` : 'Unknown Star'}</h2>
         <p class="muted">{hintFor(open.id, regions)}</p>
       {/if}
       <button class="btn" onclick={() => dialog?.close()}>Close</button>
@@ -145,7 +146,7 @@
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 10px; }
   .cell { padding: 0; border: 0; background: none; position: relative; }
   .no {
-    position: absolute; z-index: 1; top: -6px; left: -4px; font-size: 0.65rem; font-weight: 800;
+    position: absolute; z-index: 1; top: -7px; left: 50%; transform: translateX(-50%); /* top center: the values are in the top-left corner */ font-size: 0.65rem; font-weight: 800;
     background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 0 4px; color: var(--muted);
   }
   dialog {

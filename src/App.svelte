@@ -7,6 +7,7 @@
   import Settings from './components/Settings.svelte';
   import Tavern from './components/Tavern.svelte';
   import Tutorial from './components/Tutorial.svelte';
+  import { CARDS } from './data/cards';
   import { installUiSounds, reducedMotion } from './lib/fx';
   import { setTrack } from './lib/music';
   import { go, nav } from './stores/nav.svelte';
@@ -38,7 +39,7 @@
 {#if !fullscreen}
   <header class="top">
     <span class="logo">Suikoden <em>Triple Triad</em></span>
-    <span class="count" title="Stars owned">★ {save.owned.length}/110</span>
+    <span class="count" title="Cards owned">★ {save.owned.length}/{CARDS.length}</span>
   </header>
 {/if}
 

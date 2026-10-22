@@ -79,7 +79,7 @@
     <div class="deck s{mode}">
       {#each Array(size) as _, i}
         {#if deck[i]}
-          <button class="slotcard" onclick={() => toggle(deck[i])} aria-label="Remove {CARD_BY_ID[deck[i]].name}">
+          <button class="slotcard" data-sfx="remove" onclick={() => toggle(deck[i])} aria-label="Remove {CARD_BY_ID[deck[i]].name}">
             <Card id={deck[i]} showName />
           </button>
         {:else}
@@ -133,7 +133,7 @@
   <div class="pool">
     {#each pool as c (c.id)}
       {@const inDeck = deck.includes(c.id)}
-      <button class="poolcard" class:in={inDeck} onclick={() => toggle(c.id)} aria-pressed={inDeck} aria-label="{inDeck ? 'Remove' : 'Add'} {c.name}">
+      <button class="poolcard" class:in={inDeck} data-sfx={inDeck ? 'remove' : 'add'} onclick={() => toggle(c.id)} aria-pressed={inDeck} aria-label="{inDeck ? 'Remove' : 'Add'} {c.name}">
         <Card id={c.id} showName bond={partnerOfDeck(c.id)} />
         <span class="cost">{CONFIG.costs[c.rarity]}</span>
         {#if inDeck}<span class="check">✓</span>{/if}

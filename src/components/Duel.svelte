@@ -335,7 +335,7 @@
 
 <div class="duel s{mode}">
   <header class="bar">
-    <button class="btn small" onclick={() => go({ name: 'map' })} aria-label="Leave duel">✕</button>
+    <button class="btn small" data-sfx="back" onclick={() => go({ name: 'map' })} aria-label="Leave duel">✕</button>
     <Avatar file={opp.portrait} size={40} boss={opp.boss} />
     <div class="who">
       <strong>{opp.name}</strong>
@@ -410,6 +410,7 @@
     <RuleChips rules={opp.rules} />
     <button
       class="btn small sound"
+      data-sfx="none"
       onclick={() => { save.settings.sound = !save.settings.sound; persist(); sfx('click'); }}
       aria-pressed={save.settings.sound}
       aria-label="Sound effects"
@@ -471,7 +472,7 @@
           <p class="muted small">Tap a card to keep it. If you leave now, you get the strongest one.</p>
           <div class="grid">
             {#each prizeChoices as id}
-              <button class="pick" onclick={() => claim(id)}><Card {id} showName /></button>
+              <button class="pick" data-sfx="add" onclick={() => claim(id)}><Card {id} showName /></button>
             {/each}
           </div>
         {/if}

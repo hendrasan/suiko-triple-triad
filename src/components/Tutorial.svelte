@@ -68,7 +68,7 @@
 
 <div class="tut">
   <header class="row">
-    <button class="btn small" onclick={() => go({ name: 'map' })} aria-label="Exit tutorial">✕</button>
+    <button class="btn small" data-sfx="back" onclick={() => go({ name: 'map' })} aria-label="Exit tutorial">✕</button>
     <span class="muted small">Lesson {index + 1} of {LESSONS.length}</span>
   </header>
 

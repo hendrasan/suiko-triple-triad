@@ -36,7 +36,7 @@
           {#each OPPONENTS.filter((o) => o.region === r.id) as o}
             {@const b = save.beaten[o.id]}
             <li>
-              <button class="opp" class:boss={o.boss} onclick={() => go({ name: 'prep', opponent: o.id })}>
+              <button class="opp" class:boss={o.boss} data-sfx="open" onclick={() => go({ name: 'prep', opponent: o.id })}>
                 <div class="name">
                   <Avatar file={o.portrait} size={36} boss={o.boss} />
                   <strong>{o.name}</strong>

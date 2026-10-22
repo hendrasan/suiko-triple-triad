@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { sfx } from '../lib/fx';
   import { syncMusic } from '../lib/music';
   import { go } from '../stores/nav.svelte';
   import { exportSave, importSave, persist, resetSave, save } from '../stores/save.svelte';
@@ -44,7 +45,7 @@
       <span><strong>Skip animations</strong><br /><span class="muted small">Flips resolve at once. Good for long 4×4 duels.</span></span>
     </label>
     <label class="toggle">
-      <input type="checkbox" bind:checked={save.settings.sound} onchange={persist} />
+      <input type="checkbox" data-sfx="none" bind:checked={save.settings.sound} onchange={() => { persist(); sfx('click'); }} />
       <span><strong>Sound effects</strong><br /><span class="muted small">Simple generated tones.</span></span>
     </label>
     <label class="toggle">

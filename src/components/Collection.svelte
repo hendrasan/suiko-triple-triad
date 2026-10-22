@@ -46,7 +46,7 @@
   <div class="grid">
     {#each list as c (c.id)}
       {@const have = owned.has(c.id)}
-      <button class="cell" onclick={() => show(c)} aria-label={have ? c.name : `Unknown Star ${c.starNo ?? ''}`}>
+      <button class="cell" data-sfx="open" onclick={() => show(c)} aria-label={have ? c.name : `Unknown Star ${c.starNo ?? ''}`}>
         <span class="no">{c.starNo ?? '✦'}</span>
         <Card id={c.id} silhouette={!have} showName />
       </button>

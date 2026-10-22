@@ -7,7 +7,7 @@
   import Settings from './components/Settings.svelte';
   import Tavern from './components/Tavern.svelte';
   import Tutorial from './components/Tutorial.svelte';
-  import { reducedMotion } from './lib/fx';
+  import { installUiSounds, reducedMotion } from './lib/fx';
   import { setTrack } from './lib/music';
   import { go, nav } from './stores/nav.svelte';
   import { save } from './stores/save.svelte';
@@ -21,6 +21,8 @@
   ] as const;
 
   const fullscreen = $derived(nav.screen.name === 'duel' || nav.screen.name === 'tutorial');
+
+  installUiSounds();
 
   // Battle music in duels, calm music everywhere else.
   $effect(() => {
@@ -65,7 +67,7 @@
 {#if !fullscreen}
   <nav class="tabs" aria-label="Main">
     {#each TABS as t}
-      <button class:active={nav.screen.name === t.name || (t.name === 'map' && nav.screen.name === 'prep')} onclick={() => go({ name: t.name })}>
+      <button data-sfx="nav" class:active={nav.screen.name === t.name || (t.name === 'map' && nav.screen.name === 'prep')} onclick={() => go({ name: t.name })}>
         <span aria-hidden="true">{t.icon}</span>
         <span>{t.label}</span>
       </button>

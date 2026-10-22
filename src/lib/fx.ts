@@ -1,13 +1,20 @@
 // Sound effects (ZzFX: generated, no audio files) and motion helpers.
 import { save } from '../stores/save.svelte';
 
-export type Sfx = 'select' | 'place' | 'flip' | 'same' | 'plus' | 'combo' | 'unite' | 'sabotage' | 'win' | 'lose' | 'draw' | 'click';
+export type Sfx = 'select' | 'place' | 'flip' | 'same' | 'plus' | 'combo' | 'unite' | 'sabotage' | 'win' | 'lose' | 'draw'
+  | 'click' | 'nav' | 'open' | 'back' | 'add' | 'remove';
 
 type Params = (number | undefined)[];
 // ZzFX parameters: volume, randomness, frequency, attack, sustain, release, shape, shapeCurve,
 // slide, deltaSlide, pitchJump, pitchJumpTime, repeatTime, noise, modulation, bitCrush, delay, sustainVolume, decay.
 const SOUNDS: Record<Exclude<Sfx, 'win' | 'lose' | 'draw'>, Params> = {
-  click: [0.4, 0.05, 900, , 0.01, 0.02, 1, 2, , , , , , , , , , 0.5],
+  // Menu sounds: short and quiet.
+  click: [0.3, 0.05, 900, , 0.01, 0.02, 1, 2, , , , , , , , , , 0.5],
+  nav: [0.3, 0.02, 520, , 0.02, 0.05, 1, 1.4, , , 260, 0.025],
+  open: [0.3, 0.02, 440, 0.01, 0.03, 0.1, 0, 1.5, , , 220, 0.035],
+  back: [0.3, 0.02, 660, , 0.02, 0.06, 0, 1.5, , , -220, 0.03],
+  add: [0.35, 0.02, 600, , 0.03, 0.07, 1, 1.6, 9],
+  remove: [0.35, 0.02, 520, , 0.03, 0.07, 1, 1.6, -9],
   select: [0.5, 0.05, 700, , 0.02, 0.05, 1, 1.6, , , 300, 0.02],
   place: [1.2, 0.05, 160, 0.005, 0.03, 0.12, 4, 1.4, -6, , , , , 0.4, , , , 0.6, 0.04],
   flip: [0.7, 0.05, 480, 0.01, 0.04, 0.1, 1, 1.8, 4, , 220, 0.04],
@@ -39,6 +46,19 @@ export function sfx(kind: Sfx, step = 0): void {
     if (step > 1) p[2] = (p[2] ?? 220) * 2 ** ((step - 1) * 3 / 12);
     zzfx(...p);
   });
+}
+
+/**
+ * Menu sounds for every button and checkbox, from one listener.
+ * A `data-sfx` attribute picks the sound ("none" = silent). Hand cards and board cells have game sounds.
+ */
+export function installUiSounds(): void {
+  window.addEventListener('click', (e) => {
+    const el = (e.target as Element).closest<HTMLElement>('button, input[type="checkbox"], [data-sfx]');
+    if (!el || (el as HTMLButtonElement).disabled || el.closest('[data-cell], .hand-card, .hc')) return;
+    const kind = el.closest<HTMLElement>('[data-sfx]')?.dataset.sfx ?? 'click';
+    if (kind !== 'none') sfx(kind as Sfx);
+  }, true);
 }
 
 export function reducedMotion(): boolean {

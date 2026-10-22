@@ -30,12 +30,18 @@ function player(t: Track): HTMLAudioElement {
   return a;
 }
 
+// A new fade on the same track cancels the old one.
+const fades = new WeakMap<HTMLAudioElement, number>();
+
 function fade(a: HTMLAudioElement, to: number, then?: () => void) {
+  const id = (fades.get(a) ?? 0) + 1;
+  fades.set(a, id);
   const from = a.volume;
   const start = performance.now();
   const step = (now: number) => {
+    if (fades.get(a) !== id) return;
     const k = Math.min(1, (now - start) / FADE_MS);
-    a.volume = from + (to - from) * k;
+    a.volume = Math.min(1, Math.max(0, from + (to - from) * k));
     if (k < 1) requestAnimationFrame(step);
     else then?.();
   };

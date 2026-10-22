@@ -24,7 +24,7 @@
 </script>
 
 <div class="stack">
-  <button class="btn small back" onclick={() => go({ name: 'map' })}>← World</button>
+  <button class="btn small back" data-sfx="back" onclick={() => go({ name: 'map' })}>← World</button>
   <div class="panel stack">
     <div class="row head">
       <Avatar file={opp.portrait} size={72} boss={opp.boss} />

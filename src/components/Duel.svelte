@@ -15,7 +15,7 @@
   import { OPPONENT_BY_ID } from '../data/opponents';
   import { dragToCell } from '../lib/drag';
   import { sfx, wait } from '../lib/fx';
-  import { playMusic, stopMusic, syncMusic } from '../lib/music';
+  import { syncMusic } from '../lib/music';
   import { go, type Screen } from '../stores/nav.svelte';
   import { activeDeck, addCard, ownedSet, persist, save } from '../stores/save.svelte';
   import { newSeed } from '../core/rng';
@@ -64,11 +64,7 @@
   let prizeDone = $state(true);
 
   let alive = true;
-  playMusic();
-  onDestroy(() => {
-    alive = false;
-    stopMusic();
-  });
+  onDestroy(() => (alive = false));
 
   function makeGame(s: GameSetup): GameState {
     let hands = s.hands;
@@ -77,7 +73,6 @@
   }
 
   function begin() {
-    playMusic(); // Retry here: "Begin" is a click, so the browser allows audio.
     if (setup.handicap === 0) {
       phase = 'handicap';
       return;

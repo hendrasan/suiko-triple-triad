@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { syncMusic } from '../lib/music';
   import { go } from '../stores/nav.svelte';
   import { exportSave, importSave, persist, resetSave, save } from '../stores/save.svelte';
 
@@ -47,8 +48,8 @@
       <span><strong>Sound effects</strong><br /><span class="muted small">Simple generated tones.</span></span>
     </label>
     <label class="toggle">
-      <input type="checkbox" bind:checked={save.settings.music} onchange={persist} />
-      <span><strong>Battle music</strong><br /><span class="muted small">“Funked Up” by Joth (CC0, OpenGameArt).</span></span>
+      <input type="checkbox" bind:checked={save.settings.music} onchange={() => { persist(); syncMusic(); }} />
+      <span><strong>Music</strong><br /><span class="muted small">Battle: “Funked Up” by Joth. Menus: “Etirwer” by Kistol. Both CC0, from OpenGameArt.</span></span>
     </label>
     <label class="select">
       <strong>Reduced motion</strong>

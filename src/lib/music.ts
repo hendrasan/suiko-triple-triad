@@ -1,43 +1,87 @@
-// Battle music: one looping track. "Funked Up" by Joth (CC0), opengameart.org/content/funked-up
+// Background music. Two looping tracks, both CC0 from OpenGameArt:
+//   battle: "Funked Up" by Joth          https://opengameart.org/content/funked-up
+//   menu:   "Etirwer" by Kistol          https://opengameart.org/content/etirwer
 import { save } from '../stores/save.svelte';
 
-const SRC = `${import.meta.env.BASE_URL}music/funked-up.mp3`;
-const VOLUME = 0.35;
+export type Track = 'menu' | 'battle';
 
-let audio: HTMLAudioElement | null = null;
-let wanted = false;
+const BASE = `${import.meta.env.BASE_URL}music/`;
+const TRACKS: Record<Track, { files: string[]; volume: number }> = {
+  battle: { files: ['funked-up.mp3'], volume: 0.35 },
+  // OGG loops cleanly; the AAC copy is for browsers without Vorbis (Safari).
+  menu: { files: ['etirwer.ogg', 'etirwer.m4a'], volume: 0.3 },
+};
+const FADE_MS = 600;
 
-function el(): HTMLAudioElement {
-  if (!audio) {
-    audio = new Audio(SRC);
-    audio.loop = true;
-    audio.volume = VOLUME;
-    // Pause in a hidden tab, and continue when the player comes back.
-    document.addEventListener('visibilitychange', () => {
-      if (!audio) return;
-      if (document.hidden) audio.pause();
-      else if (wanted && save.settings.music) audio.play().catch(() => {});
-    });
+const players: Partial<Record<Track, HTMLAudioElement>> = {};
+let current: Track | null = null;
+
+function player(t: Track): HTMLAudioElement {
+  let a = players[t];
+  if (!a) {
+    a = new Audio();
+    const ogg = a.canPlayType('audio/ogg; codecs="vorbis"');
+    const file = TRACKS[t].files.find((f) => !f.endsWith('.ogg') || ogg) ?? TRACKS[t].files[0];
+    a.src = BASE + file;
+    a.loop = true;
+    a.volume = 0;
+    players[t] = a;
   }
-  return audio;
+  return a;
 }
 
-/** Start (or continue) the battle music. Browsers allow this only after a click or tap. */
-export function playMusic(): void {
-  wanted = true;
-  if (!save.settings.music || typeof Audio === 'undefined') return;
-  el().play().catch(() => {});
+function fade(a: HTMLAudioElement, to: number, then?: () => void) {
+  const from = a.volume;
+  const start = performance.now();
+  const step = (now: number) => {
+    const k = Math.min(1, (now - start) / FADE_MS);
+    a.volume = from + (to - from) * k;
+    if (k < 1) requestAnimationFrame(step);
+    else then?.();
+  };
+  requestAnimationFrame(step);
 }
 
-export function stopMusic(): void {
-  wanted = false;
-  if (!audio) return;
-  audio.pause();
-  audio.currentTime = 0;
+function start(t: Track) {
+  const a = player(t);
+  if (!a.paused) return fade(a, TRACKS[t].volume);
+  a.play().then(() => fade(a, TRACKS[t].volume)).catch(() => {});
+}
+
+function stop(t: Track, rewind: boolean) {
+  const a = players[t];
+  if (!a || a.paused) return;
+  fade(a, 0, () => {
+    a.pause();
+    if (rewind) a.currentTime = 0;
+  });
+}
+
+/** Choose the track for the current screen. Null = silence. */
+export function setTrack(t: Track | null): void {
+  if (t !== current && current) stop(current, current === 'battle');
+  current = t;
+  if (t && save.settings.music && typeof Audio !== 'undefined') start(t);
 }
 
 /** Apply the Music setting at once (used by the toggles). */
 export function syncMusic(): void {
-  if (save.settings.music && wanted) playMusic();
-  else audio?.pause();
+  if (!current) return;
+  if (save.settings.music) start(current);
+  else stop(current, false);
+}
+
+if (typeof window !== 'undefined') {
+  // Browsers block audio until the first click or key press. Try again then.
+  const unlock = () => {
+    if (current && save.settings.music && players[current]?.paused !== false) start(current);
+  };
+  window.addEventListener('pointerdown', unlock, { once: true, capture: true });
+  window.addEventListener('keydown', unlock, { once: true, capture: true });
+  // Pause in a hidden tab, and continue when the player comes back.
+  document.addEventListener('visibilitychange', () => {
+    if (!current) return;
+    if (document.hidden) players[current]?.pause();
+    else if (save.settings.music) start(current);
+  });
 }

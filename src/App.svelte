@@ -8,6 +8,7 @@
   import Tavern from './components/Tavern.svelte';
   import Tutorial from './components/Tutorial.svelte';
   import { reducedMotion } from './lib/fx';
+  import { setTrack } from './lib/music';
   import { go, nav } from './stores/nav.svelte';
   import { save } from './stores/save.svelte';
 
@@ -20,6 +21,11 @@
   ] as const;
 
   const fullscreen = $derived(nav.screen.name === 'duel' || nav.screen.name === 'tutorial');
+
+  // Battle music in duels, calm music everywhere else.
+  $effect(() => {
+    setTrack(nav.screen.name === 'duel' ? 'battle' : 'menu');
+  });
 
   $effect(() => {
     void save.settings.reducedMotion;

@@ -69,14 +69,12 @@ export function regionOpen(r: RegionDef, ownedCount: number, beaten: Record<stri
   return !r.unlock || !!beaten[r.unlock.boss] || ownedCount >= r.unlock.cards;
 }
 
-/** Prize choices after a win. 'choose' lists every unowned card; the others pick one. */
+/** Prize choices after a win. 'choose' lists every unowned card; 'random' picks one. */
 export function prizeOptions(opp: OpponentDef, oppDeck: string[], owned: Set<string>, rng: () => number): { rule: OpponentDef['prize']; cards: string[] } {
   const fresh = oppDeck.filter((id) => !owned.has(id));
   if (!fresh.length) return { rule: opp.prize, cards: [] };
   if (opp.prize === 'choose') return { rule: 'choose', cards: fresh };
-  if (opp.prize === 'random') return { rule: 'random', cards: [fresh[Math.floor(rng() * fresh.length)]] };
-  const sum = (id: string) => CARD_BY_ID[id].values.reduce((a, v) => a + v, 0);
-  return { rule: 'highest', cards: [fresh.reduce((a, b) => (sum(b) > sum(a) ? b : a))] };
+  return { rule: 'random', cards: [fresh[Math.floor(rng() * fresh.length)]] };
 }
 
 /** Hint text for a missing card on the collection screen. */

@@ -4,7 +4,10 @@ import type { BoardSize, Rules, Rune } from '../core/types';
 export type Mode = BoardSize;
 export type Difficulty = 'easy' | 'normal' | 'hard' | 'boss';
 export type Personality = 'balanced' | 'aggressive' | 'defensive' | 'bond' | 'rune';
-export type PrizeRule = 'choose' | 'random' | 'highest';
+export type PrizeRule = 'choose' | 'random';
+
+/** Short player-facing label for each prize rule. */
+export const PRIZE_LABEL: Record<PrizeRule, string> = { choose: 'Reward: Choose 1', random: 'Reward: Random' };
 /** [cell index, rune]. Cells are row-major for that board size. */
 export type RuneTile = [number, Rune];
 

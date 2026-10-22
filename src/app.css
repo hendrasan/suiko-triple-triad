@@ -27,6 +27,7 @@
   --font: 'Avenir Next', 'Segoe UI', system-ui, sans-serif;
   --font-title: 'Palatino', 'Book Antiqua', Georgia, serif;
   --tap: 44px;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   color-scheme: dark;
 }
 
@@ -99,6 +100,10 @@ button {
 .chip.on { color: var(--gold-2); border-color: var(--gold); }
 
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Section entrance for rarely visited screens. Set --i on each element for a short stagger. */
+.rise { animation: rise 280ms var(--ease-out) both; animation-delay: calc(var(--i, 0) * 50ms); }
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } }
 
 /* Reduced motion: from the OS, or forced on in settings. */
 html.reduce-motion *, html.reduce-motion *::before, html.reduce-motion *::after {

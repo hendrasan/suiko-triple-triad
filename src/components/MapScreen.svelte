@@ -3,6 +3,7 @@
   import { OPPONENTS, REGIONS } from '../data/opponents';
   import { go } from '../stores/nav.svelte';
   import { save } from '../stores/save.svelte';
+  import { PRIZE_LABEL } from '../data/schema';
   import Avatar from './Avatar.svelte';
   import RuleChips from './RuleChips.svelte';
 
@@ -43,7 +44,7 @@
                   {#if o.boss}<span class="tag">Boss · Bo2</span>{/if}
                   <span class="diff" aria-label="Difficulty {o.difficulty}">{DIFF[o.difficulty]}</span>
                 </div>
-                <div class="muted small">{o.title} · Prize: {o.prize === 'choose' ? 'your choice' : o.prize}</div>
+                <div class="muted small">{o.title} · {PRIZE_LABEL[o.prize]}</div>
                 <RuleChips rules={o.rules} />
                 <div class="wins small">
                   <span class:done={b?.[3]}>3×3 {b?.[3] ? '✓' : '—'}</span>

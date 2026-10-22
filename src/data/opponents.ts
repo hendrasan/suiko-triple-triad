@@ -65,7 +65,7 @@ export const OPPONENTS: OpponentDef[] = [
     id: 'merchant', name: 'South Window Merchant', title: 'South Window', region: 'two-river',
     intro: 'Every card has a price. Plays the Plus rule.',
     deck: ['alex', 'hilda', 'clive', 'adlai', 'richmond', 'oulan', 'barbara', 'amada'],
-    rules: rules({ plus: true }), format: 'single', prize: 'highest', difficulty: 'normal', personality: 'balanced',
+    rules: rules({ plus: true }), format: 'single', prize: 'choose', difficulty: 'normal', personality: 'balanced',
     tiles: { 3: [[2, 'earth']], 4: [[3, 'earth'], [12, 'earth'], [6, 'fire']] }, faction: 'city-states',
   },
   {
@@ -118,14 +118,14 @@ export const OPPONENTS: OpponentDef[] = [
     id: 'trader', name: 'Gregminster Trader', title: 'Gregminster', region: 'tinto',
     intro: 'Old Toran money. Plays for profit.',
     deck: ['gordon', 'lorelai', 'mondo', 'sasuke', 'tomo', 'bob', 'annallee', 'kasumi'],
-    rules: rules({ same: true, plus: true }), format: 'single', prize: 'highest', difficulty: 'hard', personality: 'balanced',
+    rules: rules({ same: true, plus: true }), format: 'single', prize: 'choose', difficulty: 'hard', personality: 'balanced',
     tiles: { 3: [[0, 'wind'], [8, 'lightning']], 4: [[0, 'wind'], [3, 'lightning'], [12, 'lightning'], [15, 'wind']] }, faction: 'neutral',
   },
   {
     id: 'neclord', portrait: 'neclord', name: 'Neclord', title: 'Lord of the Undead', region: 'tinto', boss: true,
     intro: 'The vampire returns. His chains of Combo never end.',
     deck: ['sierra', 'hauser', 'jess', 'georg', 'gantetsu', 'pico', 'alberto', 'kahn'],
-    rules: ALL_RULES, format: 'bo2', prize: 'highest', difficulty: 'hard', personality: 'aggressive',
+    rules: ALL_RULES, format: 'bo2', prize: 'choose', difficulty: 'hard', personality: 'aggressive',
     tiles: { 3: [[2, 'water'], [6, 'water']], 4: [[0, 'water'], [3, 'water'], [12, 'water'], [15, 'water']] }, faction: 'neutral',
   },
   // ---- Luca's Court ----

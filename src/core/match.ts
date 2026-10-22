@@ -115,14 +115,12 @@ export interface MatchSummary {
 
 export function summarize(opp: OpponentDef, mode: BoardSize, deck: string[], logs: GameLog[], seed: number): MatchSummary {
   const gameWins = logs.map((l) => Math.sign(l.score[0] - l.score[1]));
-  const wins = gameWins.filter((w) => w > 0).length;
-  const losses = gameWins.filter((w) => w < 0).length;
-  const total = logs.reduce((a, l) => [a[0] + l.score[0], a[1] + l.score[1]], [0, 0]);
-  // Best of two: game wins first, total cards owned break ties.
-  const outcome = wins !== losses ? Math.sign(wins - losses) : Math.sign(total[0] - total[1]);
-  const won = outcome > 0;
+  // Best of two: the player must win both games. Any lost game loses the match.
+  // The duel stops after game 1 when the player did not win it, so a match can have one game.
+  const won = gameWins.every((w) => w > 0) && logs.length === (opp.format === 'bo2' ? 2 : 1);
+  const lost = gameWins.some((w) => w < 0);
   return {
-    opponent: opp.id, mode, deck, won, draw: outcome === 0, seed,
+    opponent: opp.id, mode, deck, won, draw: !won && !lost, seed,
     games: logs.map((l) => ({ score: l.score, first: l.first })),
     flawless: logs.every((l) => l.lost === 0),
     flipsMax: Math.max(...logs.map((l) => l.flipsMax)),

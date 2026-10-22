@@ -10,6 +10,7 @@ export const SLOTS = 3;
 export interface Settings {
   skipAnimations: boolean;
   sound: boolean;
+  music: boolean;
   reducedMotion: 'auto' | 'on' | 'off';
 }
 
@@ -62,7 +63,7 @@ export function newSave(): SaveData {
     beaten: {},
     stats: { duels: 0, wins: 0 },
     tutorialDone: false,
-    settings: { skipAnimations: false, sound: true, reducedMotion: 'auto' },
+    settings: { skipAnimations: false, sound: true, music: true, reducedMotion: 'auto' },
     lastDuel: null,
   };
 }

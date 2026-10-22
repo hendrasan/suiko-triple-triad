@@ -46,6 +46,10 @@
       <input type="checkbox" bind:checked={save.settings.sound} onchange={persist} />
       <span><strong>Sound effects</strong><br /><span class="muted small">Simple generated tones.</span></span>
     </label>
+    <label class="toggle">
+      <input type="checkbox" bind:checked={save.settings.music} onchange={persist} />
+      <span><strong>Battle music</strong><br /><span class="muted small">“Funked Up” by Joth (CC0, OpenGameArt).</span></span>
+    </label>
     <label class="select">
       <strong>Reduced motion</strong>
       <select bind:value={save.settings.reducedMotion} onchange={persist}>

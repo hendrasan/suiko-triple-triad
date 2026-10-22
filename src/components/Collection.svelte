@@ -1,6 +1,7 @@
 <script lang="ts">
   import { CONFIG } from '../core/config';
   import { hintFor } from '../core/progress';
+  import { cap } from '../lib/text';
   import { ABILITIES } from '../data/abilities';
   import { BONDS } from '../data/bonds';
   import type { CardDef } from '../core/types';
@@ -65,8 +66,8 @@
         </p>
         <p>{open.blurb}</p>
         <div class="row small">
-          <span class="chip"><RuneIcon rune={open.rune} size={12} /> {open.rune}</span>
-          <span class="chip">{open.rarity}</span>
+          <span class="chip"><RuneIcon rune={open.rune} size={12} /> {cap(open.rune)}</span>
+          <span class="chip">{cap(open.rarity)}</span>
           <span class="chip">Cost {CONFIG.costs[open.rarity]}</span>
           <span class="chip">Total {open.values.reduce((a, v) => a + v, 0)}</span>
           {#if save.via[open.id]}<span class="chip">{VIA[save.via[open.id]] ?? save.via[open.id]}</span>{/if}

@@ -32,13 +32,17 @@ describe('match setup', () => {
     expect(setupGame(OPPONENT_BY_ID.rowd, 3, STARTERS.slice(0, 5), 5, 0).handicap).toBeNull();
   });
 
-  it('best of two: total cards break a 1-1 tie', () => {
-    const l1 = { ...newLog(0), score: [6, 4] as [number, number] };
-    const l2 = { ...newLog(1), score: [3, 7] as [number, number] };
-    const s = summarize(OPPONENT_BY_ID.rowd, 3, [], [l1, l2], 1);
-    expect(s.won).toBe(false); // 9 vs 11
-    const l3 = { ...newLog(1), score: [4, 6] as [number, number] };
-    expect(summarize(OPPONENT_BY_ID.rowd, 3, [], [l1, l3], 1).draw).toBe(true); // 10 vs 10
+  it('best of two: the player must win both games', () => {
+    const win = (first: 0 | 1) => ({ ...newLog(first), score: [6, 4] as [number, number] });
+    const loss = { ...newLog(1), score: [3, 7] as [number, number] };
+    const draw = { ...newLog(0), score: [5, 5] as [number, number] };
+    const o = OPPONENT_BY_ID.rowd;
+    expect(summarize(o, 3, [], [win(0), win(1)], 1).won).toBe(true);
+    const split = summarize(o, 3, [], [win(0), loss], 1);
+    expect([split.won, split.draw]).toEqual([false, false]); // 1-1 is a defeat
+    expect(summarize(o, 3, [], [loss], 1).won).toBe(false); // ends after a game 1 loss
+    expect(summarize(o, 3, [], [draw], 1).draw).toBe(true); // ends after a game 1 draw
+    expect(summarize(o, 3, [], [win(0)], 1).won).toBe(false); // one win is not enough
   });
 });
 

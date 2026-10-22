@@ -1,7 +1,8 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
   import { askAI } from '../ai/client';
-  import { applyMove, createGame, isOver, previewValues, score } from '../core/engine';
+  import { applyMove, createGame, isOver, previewValues, runeMod, score } from '../core/engine';
+  import { cap } from '../lib/text';
   import {
     aiBoostPick, boostCard, newLog, opponentDeck, record, setupGame, summarize, tilesFor,
     type GameLog, type GameSetup, type MatchSummary,
@@ -14,6 +15,7 @@
   import { OPPONENT_BY_ID } from '../data/opponents';
   import { dragToCell } from '../lib/drag';
   import { sfx, wait } from '../lib/fx';
+  import { playMusic, stopMusic, syncMusic } from '../lib/music';
   import { go, type Screen } from '../stores/nav.svelte';
   import { activeDeck, addCard, ownedSet, persist, save } from '../stores/save.svelte';
   import { newSeed } from '../core/rng';
@@ -62,7 +64,11 @@
   let prizeDone = $state(true);
 
   let alive = true;
-  onDestroy(() => (alive = false));
+  playMusic();
+  onDestroy(() => {
+    alive = false;
+    stopMusic();
+  });
 
   function makeGame(s: GameSetup): GameState {
     let hands = s.hands;
@@ -71,6 +77,7 @@
   }
 
   function begin() {
+    playMusic(); // Retry here: "Begin" is a click, so the browser allows audio.
     if (setup.handicap === 0) {
       phase = 'handicap';
       return;
@@ -160,7 +167,8 @@
   function endGame() {
     log.score = score(game);
     logs.push(log);
-    if (opp.format === 'bo2' && gameNo === 0) {
+    // Best of two: you must win both games. After a game 1 draw or loss the match is already decided.
+    if (opp.format === 'bo2' && gameNo === 0 && log.score[0] > log.score[1]) {
       phase = 'between';
       return;
     }
@@ -293,7 +301,11 @@
     const parts = Object.entries(counts).filter(([c]) => c !== 'basic').map(([c, n]) => `${n} ${c}`);
     const tile = game.tiles[aim!];
     const extra: string[] = [];
-    if (tile && game.rules.runes) extra.push(tile === CARD_BY_ID[preview.id].rune ? `${tile} tile +1` : `${tile} tile −1`);
+    if (tile && game.rules.runes) {
+      const card = game.hands[0][selected!];
+      const mod = runeMod(card.rune, tile, card.ability);
+      extra.push(`${cap(tile)} tile ${mod > 0 ? `+${mod}` : mod < 0 ? `−${-mod}` : '±0'}`);
+    }
     if (r.bonds.length) extra.push(`bond: ${r.bonds.map(bondName).join(', ')}`);
     if (r.unite) extra.push(`Unite Attack: ${bondName(r.unite)}`);
     if (r.sabotage) extra.push(`Sabotage −1 on ${CARD_BY_ID[game.board[r.sabotage.cell]!.card.id].name}`);
@@ -334,13 +346,15 @@
       <strong>{opp.name}</strong>
       <span class="muted small">{opp.title}{opp.format === 'bo2' ? ` · Game ${gameNo + 1} of 2` : ''}</span>
     </div>
-    <div class="score p1s" aria-label="Opponent score {live[1]}">◆ {live[1]}</div>
   </header>
 
-  <div class="opp-hand" aria-label="Opponent hand, {game.hands[1].length} cards">
-    {#each game.hands[1] as c (c.uid)}
-      <div class="mini"><Card id={c.id} faceDown /></div>
-    {/each}
+  <div class="side opp-side">
+    <div class="score p1s" aria-label="Opponent score {live[1]}">◆ {live[1]}</div>
+    <div class="opp-hand" aria-label="Opponent hand, {game.hands[1].length} cards">
+      {#each game.hands[1] as c (c.uid)}
+        <div class="mini"><Card id={c.id} faceDown /></div>
+      {/each}
+    </div>
   </div>
 
   <div class="center">
@@ -360,31 +374,34 @@
 
   <p class="status" aria-live="polite">{statusText}</p>
 
-  <div class="my-hand" class:boosting={phase === 'handicap'} role="listbox" aria-label="Your hand">
-    {#each game.hands[0] as c, i (c.uid)}
-      <button
-        bind:this={handEls[i]}
-        class="hand-card"
-        class:sel={selected === i}
-        class:lifted={drag?.i === i}
-        use:dragToCell={{
-          enabled: () => myTurn,
-          start: () => startDrag(i),
-          move: (x, y, cell) => {
-            if (drag) drag = { ...drag, x, y };
-            aim = cell;
-          },
-          drop: (cell) => dropDrag(i, cell),
-        }}
-        role="option"
-        aria-selected={selected === i}
-        disabled={!(myTurn || phase === 'handicap')}
-        onclick={() => selectCard(i)}
-      >
-        <Card id={c.id} boost={c.boost} owner={0} selected={selected === i} />
-        <span class="key" aria-hidden="true">{i + 1}</span>
-      </button>
-    {/each}
+  <div class="side my-side">
+    <div class="score p0s" aria-label="Your score {live[0]}">● {live[0]}</div>
+    <div class="my-hand" class:boosting={phase === 'handicap'} role="listbox" aria-label="Your hand">
+      {#each game.hands[0] as c, i (c.uid)}
+        <button
+          bind:this={handEls[i]}
+          class="hand-card"
+          class:sel={selected === i}
+          class:lifted={drag?.i === i}
+          use:dragToCell={{
+            enabled: () => myTurn,
+            start: () => startDrag(i),
+            move: (x, y, cell) => {
+              if (drag) drag = { ...drag, x, y };
+              aim = cell;
+            },
+            drop: (cell) => dropDrag(i, cell),
+          }}
+          role="option"
+          aria-selected={selected === i}
+          disabled={!(myTurn || phase === 'handicap')}
+          onclick={() => selectCard(i)}
+        >
+          <Card id={c.id} boost={c.boost} owner={0} selected={selected === i} />
+          <span class="key" aria-hidden="true">{i + 1}</span>
+        </button>
+      {/each}
+    </div>
   </div>
 
   {#if drag && drag.x > -999}
@@ -402,7 +419,13 @@
       aria-pressed={save.settings.sound}
       aria-label="Sound effects"
     >{save.settings.sound ? '🔊' : '🔇'}</button>
-    <div class="score p0s" aria-label="Your score {live[0]}">● {live[0]}</div>
+    <button
+      class="btn small music"
+      class:off={!save.settings.music}
+      onclick={() => { save.settings.music = !save.settings.music; persist(); syncMusic(); }}
+      aria-pressed={save.settings.music}
+      aria-label="Music"
+    >🎵</button>
   </footer>
 
   {#if phase === 'intro'}
@@ -411,7 +434,7 @@
         <h2>{gameNo === 0 ? opp.name : 'Game 2'}</h2>
         {#if gameNo === 0}<p class="muted">{opp.intro}</p>{/if}
         <p><strong>Coin flip:</strong> {setup.first === 0 ? 'You go first.' : `${opp.name} goes first.`}</p>
-        {#if gameNo === 1}<p class="muted small">The first player switches in game 2. Total cards decide a 1–1 tie.</p>{/if}
+        {#if gameNo === 1}<p class="muted small">The first player switches. Win this game to win the match.</p>{/if}
         {#if setup.handicap === 0}
           <p class="small">Parity handicap: you will boost one card by +1.</p>
         {:else if setup.handicap === 1}
@@ -425,8 +448,9 @@
   {:else if phase === 'between'}
     <div class="overlay">
       <div class="panel dialog stack">
-        <h2>Game 1 over</h2>
+        <h2>You won game 1</h2>
         <p>You {logs[0].score[0]} – {logs[0].score[1]} {opp.name}</p>
+        <p class="muted small">Win game 2 too, and the match is yours. The first player switches.</p>
         <button class="btn primary" onclick={nextGame}>Play game 2</button>
       </div>
     </div>
@@ -491,6 +515,8 @@
   .bar { grid-area: head; display: flex; align-items: center; gap: 10px; }
   .foot { grid-area: foot; justify-content: space-between; }
   .sound { margin-left: auto; min-width: 44px; }
+  .music { min-width: 44px; }
+  .music.off { opacity: 0.4; text-decoration: line-through; }
   .who { flex: 1; display: flex; flex-direction: column; line-height: 1.2; min-width: 0; }
   .score {
     font-weight: 800; font-size: 1.4rem; min-width: 64px; text-align: center;
@@ -499,7 +525,10 @@
   .p0s { background: var(--p0-deep); color: #cfe2ff; border: 2px solid var(--p0); }
   .p1s { background: var(--p1-deep); color: #ffe0c2; border: 2px dashed var(--p1); }
 
-  .opp-hand { grid-area: opp; display: flex; gap: 4px; justify-content: center; }
+  .opp-side { grid-area: opp; display: flex; align-items: center; justify-content: center; gap: 12px; }
+  .opp-hand { display: flex; gap: 4px; justify-content: center; }
+  .my-side { grid-area: hand; display: flex; flex-direction: column; gap: 6px; }
+  .my-side .score { align-self: center; }
   .mini { width: 30px; }
 
   .center { grid-area: board; position: relative; }
@@ -517,7 +546,7 @@
 
   .status { grid-area: status; min-height: 2.6em; margin: 0; text-align: center; font-size: 0.9rem; color: var(--muted); }
 
-  .my-hand { grid-area: hand; display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+  .my-hand { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
   .s4 .my-hand { grid-template-columns: repeat(4, 1fr); }
   .my-hand.boosting .hand-card { animation: glow 1.2s ease-in-out infinite alternate; border-radius: 10px; }
   @keyframes glow { from { box-shadow: 0 0 0 0 transparent; } to { box-shadow: 0 0 0 3px var(--gold); } }
@@ -568,8 +597,10 @@
         'foot foot foot';
       align-items: start;
     }
-    .opp-hand { flex-direction: column; align-items: center; padding-top: 20px; }
+    .side { flex-direction: column; align-items: center; gap: 12px; padding-top: 12px; }
+    .my-side { align-items: stretch; }
+    .opp-hand { flex-direction: column; align-items: center; }
     .mini { width: 64px; }
-    .my-hand, .s4 .my-hand { grid-template-columns: repeat(2, 1fr); padding-top: 12px; }
+    .my-hand, .s4 .my-hand { grid-template-columns: repeat(2, 1fr); }
   }
 </style>

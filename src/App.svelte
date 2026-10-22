@@ -94,4 +94,19 @@
   }
   .tabs button span:first-child { font-size: 1.2rem; line-height: 1; }
   .tabs button.active { color: var(--gold-2); }
+
+  /* Desktop: the menu is a sidebar on the left. Mobile keeps the bottom bar. */
+  @media (min-width: 960px) {
+    .tabs {
+      top: 0; right: auto; width: 96px;
+      grid-template-columns: 1fr; grid-auto-rows: 76px; align-content: start;
+      padding: 72px 0 0;
+      border-top: 0; border-right: 1px solid var(--line);
+    }
+    .tabs button { min-height: 76px; font-size: 0.78rem; border-left: 3px solid transparent; }
+    .tabs button.active { border-left-color: var(--gold); background: rgb(217 180 91 / 0.06); }
+    .tabs button span:first-child { font-size: 1.4rem; }
+    .top { padding-left: calc(96px + 16px); }
+    main:not(.fullscreen) { padding: 24px 24px 32px calc(96px + 24px); max-width: calc(960px + 96px); }
+  }
 </style>

@@ -15,7 +15,7 @@
     <div class="panel tut row">
       <div style="flex:1">
         <h3>New to Triple Triad?</h3>
-        <p class="muted small">A short lesson covers flips, Same, Plus, Combo, runes, and bonds.</p>
+        <p class="muted small">A short lesson covers flips, Same, Plus, Combo, runes, bonds, and abilities.</p>
       </div>
       <button class="btn primary" onclick={() => go({ name: 'tutorial' })}>Tutorial</button>
     </div>

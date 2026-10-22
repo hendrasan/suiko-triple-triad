@@ -36,7 +36,7 @@
     <p>{opp.intro}</p>
     <RuleChips rules={opp.rules} showOff />
     <p class="small muted">
-      {opp.format === 'bo2' ? 'Best of two. The first player switches in game 2. Total cards decide a 1–1 tie.' : mode === 4 ? 'Single game. The first player boosts one card by +1, because the second player gets the last move.' : 'Single game.'}
+      {opp.format === 'bo2' ? 'Best of two: win both games to win the match. The first player switches in game 2.' : mode === 4 ? 'Single game. The first player boosts one card by +1, because the second player gets the last move.' : 'Single game.'}
       Prize: {opp.prize === 'choose' ? 'choose one of their cards' : opp.prize === 'random' ? 'a random card from their hand' : 'their strongest card'}.
     </p>
   </div>

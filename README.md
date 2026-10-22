@@ -46,7 +46,8 @@ Card and opponent art is in `public/portraits/<file>.webp`. The default file nam
   - **Sabotage** (Hoi, Shilo, Sasuke, Koyu, Lo Wen): when placed, the adjacent enemy card with the highest facing value loses 1 on that side, before attacks. The −1 lasts all game, even if that card changes sides.
   - **Rune-born** (Jeane, Mazus, Lorelai, Tomo, Tetsu): +2 on a matching rune tile, and no −1 on other runes.
 - **Sound**: ZzFX sound effects, generated in the browser (no audio files). On by default; toggle with 🔊 in a duel or in Settings.
-- **Parity**: casual 4×4 duels give +1 to one card of the first player (the second player gets the last move). Casual 3×3 duels have no handicap. Bosses play best of two; the first player switches; total cards break a 1–1 tie.
+- **Music**: battle music is [“Funked Up” by Joth](https://opengameart.org/content/funked-up) (CC0, credit requested by the author), in `public/music/`. Toggle with 🎵 in a duel or in Settings.
+- **Parity**: casual 4×4 duels give +1 to one card of the first player (the second player gets the last move). Casual 3×3 duels have no handicap. Bosses play best of two: you must win both games (the first player switches). After a game 1 draw or loss, the match ends: a draw or a defeat.
 - Hands are hidden. The AI sees face-down stand-ins (5/5/5/5) for your cards.
 
 ## Progression

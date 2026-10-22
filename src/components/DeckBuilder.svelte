@@ -5,6 +5,7 @@
   import { CARD_BY_ID } from '../data/cards';
   import { SLOTS, defaultDeck } from '../stores/saveData';
   import { deckCost, deckProblem, persist, save } from '../stores/save.svelte';
+  import { cap } from '../lib/text';
   import Card from './Card.svelte';
   import RuneIcon from './RuneIcon.svelte';
 
@@ -116,7 +117,7 @@
 
   <div class="row filters">
     <label class="small">Rune
-      <select bind:value={rune}><option value="all">All</option>{#each RUNES as r}<option value={r}>{r}</option>{/each}</select>
+      <select bind:value={rune}><option value="all">All</option>{#each RUNES as r}<option value={r}>{cap(r)}</option>{/each}</select>
     </label>
     <label class="small">Rarity
       <select bind:value={rarity}>
@@ -155,7 +156,7 @@
   .filters label { display: flex; flex-direction: column; gap: 2px; color: var(--muted); }
   select {
     min-height: 40px; border-radius: 8px; background: var(--panel); color: var(--text);
-    border: 1px solid var(--line); padding: 0 8px; font: inherit; text-transform: capitalize;
+    border: 1px solid var(--line); padding: 0 8px; font: inherit;
   }
   .pool { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 10px; }
   .poolcard.in :global(.card) { opacity: 0.45; }

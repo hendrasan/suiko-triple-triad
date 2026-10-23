@@ -7,7 +7,7 @@
   import { CARD_BY_ID } from '../data/cards';
   import { SLOTS, defaultDeck } from '../stores/saveData';
   import { deckCost, deckProblem, persist, save } from '../stores/save.svelte';
-  import { cap } from '../lib/text';
+  import { cap, matchesCard } from '../lib/text';
   import { SHAPES, UNITE_TEXT } from '../data/formations';
   import Card from './Card.svelte';
   import ShapeIcon from './ShapeIcon.svelte';
@@ -19,6 +19,7 @@
   let rune = $state<Rune | 'all'>('all');
   let rarity = $state<Rarity | 'all'>('all');
   let sort = $state<'power' | 'star' | 'name'>('power');
+  let query = $state('');
 
   const slot = $derived(save.activeSlot[mode]);
   const deck = $derived(save.decks[mode][slot]);
@@ -30,7 +31,7 @@
   const pool = $derived(
     save.owned
       .map((id) => CARD_BY_ID[id])
-      .filter((c) => (rune === 'all' || c.rune === rune) && (rarity === 'all' || c.rarity === rarity))
+      .filter((c) => (rune === 'all' || c.rune === rune) && (rarity === 'all' || c.rarity === rarity) && matchesCard(c, query))
       .sort((a, b) =>
         sort === 'power' ? sum(b.id) - sum(a.id) : sort === 'name' ? a.name.localeCompare(b.name) : (a.starNo ?? 999) - (b.starNo ?? 999),
       ),
@@ -135,6 +136,7 @@
     {/if}
   </div>
 
+  <input class="search" type="search" bind:value={query} placeholder="Search name or Star no." aria-label="Search cards" />
   <div class="row filters">
     <label class="small">Rune
       <select bind:value={rune}><option value="all">All</option>{#each RUNES as r}<option value={r}>{cap(r)}</option>{/each}</select>
@@ -160,6 +162,7 @@
       </button>
     {/each}
   </div>
+  {#if !pool.length}<p class="muted small none">No cards match.</p>{/if}
 </div>
 
 <style>
@@ -190,6 +193,7 @@
     min-height: 40px; border-radius: 8px; background: var(--panel); color: var(--text);
     border: 1px solid var(--line); padding: 0 8px; font: inherit;
   }
+  .none { margin: 0; text-align: center; }
   .pool { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 10px; }
   .poolcard.in :global(.card) { opacity: 0.45; }
   .cost {

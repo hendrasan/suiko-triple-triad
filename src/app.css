@@ -111,3 +111,12 @@ html.reduce-motion *, html.reduce-motion *::before, html.reduce-motion *::after 
   animation-iteration-count: 1 !important;
   transition-duration: 1ms !important;
 }
+
+/* Text search (Deck, Stars) */
+.search {
+  width: 100%; min-height: 40px; padding: 0 12px; border-radius: 8px; font: inherit; font-size: 0.95rem;
+  background: var(--panel); color: var(--text); border: 1px solid var(--line);
+  transition: border-color 150ms ease;
+}
+.search::placeholder { color: var(--muted); opacity: 0.8; }
+.search:focus { outline: none; border-color: var(--gold); }

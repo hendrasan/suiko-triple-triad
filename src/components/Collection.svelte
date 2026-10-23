@@ -2,7 +2,7 @@
   import { CONFIG } from '../core/config';
   import { hintFor, secretsOpen } from '../core/progress';
   import { REPORTS } from '../data/reports';
-  import { cap } from '../lib/text';
+  import { cap, matchesCard } from '../lib/text';
   import { ABILITIES } from '../data/abilities';
   import { BONDS } from '../data/bonds';
   import type { CardDef } from '../core/types';
@@ -14,6 +14,7 @@
   import RuneIcon from './RuneIcon.svelte';
 
   let filter = $state<'all' | 'heavenly' | 'earthly'>('all');
+  let query = $state('');
   let open = $state<CardDef | null>(null);
   let dialog = $state<HTMLDialogElement | undefined>();
 
@@ -23,7 +24,7 @@
   const kind = (c: CardDef): 'heavenly' | 'earthly' | 'story' =>
     c.starNo ? (c.starNo <= 36 ? 'heavenly' : 'earthly') : c.extraNo ? (c.rarity === 'common' ? 'earthly' : 'heavenly') : 'story';
   const list = $derived(
-    CARDS.filter((c) => filter === 'all' || kind(c) === filter),
+    CARDS.filter((c) => (filter === 'all' || kind(c) === filter) && matchesCard(c, query, owned.has(c.id))),
   );
   const count = (k: 'heavenly' | 'earthly') => {
     const all = CARDS.filter((c) => kind(c) === k);
@@ -77,12 +78,15 @@
     </div>
   </header>
 
-  <div class="filters rise" style="--i:1" role="radiogroup" aria-label="Filter">
-    {#each FILTERS as f}
-      <button class="seg" class:on={filter === f.k} role="radio" aria-checked={filter === f.k} onclick={() => (filter = f.k)}>
-        {f.label} <span class="n">{f.n}</span>
-      </button>
-    {/each}
+  <div class="tools rise" style="--i:1">
+    <div class="filters" role="radiogroup" aria-label="Filter">
+      {#each FILTERS as f}
+        <button class="seg" class:on={filter === f.k} role="radio" aria-checked={filter === f.k} onclick={() => (filter = f.k)}>
+          {f.label} <span class="n">{f.n}</span>
+        </button>
+      {/each}
+    </div>
+    <input class="search" type="search" bind:value={query} placeholder="Search name or Star no." aria-label="Search Stars" />
   </div>
 
   <div class="grid rise" style="--i:2">
@@ -99,6 +103,7 @@
       </button>
     {/each}
   </div>
+  {#if !list.length}<p class="muted small none">No Stars match.</p>{/if}
 </div>
 
 <dialog bind:this={dialog} onclick={(e) => e.target === dialog && dialog?.close()}>
@@ -200,6 +205,11 @@
   .bar.gold span { background: linear-gradient(90deg, var(--gold), var(--gold-2)); }
   .bar.bronze span { background: linear-gradient(90deg, #8a6a46, #c49a6c); }
   .bar.blue span { background: linear-gradient(90deg, #4d7fb3, #8fb3d9); }
+
+  /* Filter + search: one row on wide screens, stacked on phones */
+  .tools { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .tools .search { flex: 1 1 220px; }
+  .none { margin: 0; text-align: center; }
 
   /* Segmented filter */
   .filters {

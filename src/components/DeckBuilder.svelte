@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { OPPONENT_BY_ID } from '../data/opponents';
+  import { go } from '../stores/nav.svelte';
   import { CONFIG } from '../core/config';
   import { RUNES, type BoardSize, type Rarity, type Rune } from '../core/types';
   import { BONDS } from '../data/bonds';
@@ -11,7 +13,7 @@
   import ShapeIcon from './ShapeIcon.svelte';
   import RuneIcon from './RuneIcon.svelte';
 
-  let { initialMode }: { initialMode?: BoardSize } = $props();
+  let { initialMode, back }: { initialMode?: BoardSize; back?: string } = $props();
   // svelte-ignore state_referenced_locally
   let mode = $state<BoardSize>(initialMode ?? 3);
   let rune = $state<Rune | 'all'>('all');
@@ -62,6 +64,9 @@
 </script>
 
 <div class="stack">
+  {#if back}
+    <button class="btn small back" data-sfx="back" onclick={() => go({ name: 'prep', opponent: back, mode })}>← Back to {OPPONENT_BY_ID[back]?.name ?? 'duel'}</button>
+  {/if}
   <div class="row" role="radiogroup" aria-label="Mode">
     <button class="btn" class:primary={mode === 3} role="radio" aria-checked={mode === 3} onclick={() => (mode = 3)}>Triple Triad · 5</button>
     <button class="btn" class:primary={mode === 4} role="radio" aria-checked={mode === 4} onclick={() => (mode = 4)}>Quad Quartet · 8</button>
@@ -158,6 +163,7 @@
 </div>
 
 <style>
+  .back { align-self: flex-start; }
   .spacer { flex: 1; }
   /* minmax(0, 1fr): columns stay equal and never grow wider than the panel. */
   .deck { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; align-items: start; }

@@ -47,13 +47,13 @@
   {#if nav.screen.name === 'map'}
     <MapScreen />
   {:else if nav.screen.name === 'prep'}
-    <Prep opponent={nav.screen.opponent} />
+    <Prep opponent={nav.screen.opponent} initialMode={nav.screen.mode} />
   {:else if nav.screen.name === 'duel'}
     {#key nav.screen.seed}
       <Duel opponent={nav.screen.opponent} mode={nav.screen.mode} seed={nav.screen.seed} />
     {/key}
   {:else if nav.screen.name === 'decks'}
-    <DeckBuilder initialMode={nav.screen.mode} />
+    <DeckBuilder initialMode={nav.screen.mode} back={nav.screen.back} />
   {:else if nav.screen.name === 'collection'}
     <Collection />
   {:else if nav.screen.name === 'tavern'}

@@ -6,13 +6,15 @@
   import { portraitUrl } from '../data/portraits';
   import { PRIZE_LABEL } from '../data/schema';
   import { go } from '../stores/nav.svelte';
-  import { activeDeck, deckCost, deckProblem, save } from '../stores/save.svelte';
+  import { activeDeck, deckCost, deckProblem, persist, save } from '../stores/save.svelte';
+  import { SLOTS } from '../stores/saveData';
   import Card from './Card.svelte';
 
-  let { opponent }: { opponent: string } = $props();
+  let { opponent, initialMode }: { opponent: string; initialMode?: BoardSize } = $props();
   const opp = $derived(OPPONENT_BY_ID[opponent]);
   const region = $derived(REGIONS.find((r) => r.id === opp.region));
-  let mode = $state<BoardSize>(3);
+  // svelte-ignore state_referenced_locally
+  let mode = $state<BoardSize>(initialMode ?? 3);
 
   const deck = $derived(activeDeck(mode));
   const problem = $derived(deckProblem(deck, mode));
@@ -55,7 +57,7 @@
       {/if}
     </div>
     <div class="id">
-      <p class="eyebrow">{region?.name} · {opp.title}</p>
+      <p class="eyebrow">{region?.name}{opp.title !== region?.name ? ` · ${opp.title}` : ''}</p>
       <h1>{opp.name}</h1>
       <div class="badges">
         {#if opp.boss}<span class="badge boss-badge">Boss</span>{/if}
@@ -92,8 +94,24 @@
   <section class="panel rise" style="--i:2">
     <div class="deck-head">
       <h3>Your deck</h3>
-      <span class="muted small">Slot {save.activeSlot[mode] + 1}{mode === 4 ? ` · cost ${deckCost(deck)}/${CONFIG.costCap}` : ''}</span>
-      <button class="btn small edit" onclick={() => go({ name: 'decks', mode })}>Edit deck</button>
+      {#if mode === 4}<span class="muted small">Cost {deckCost(deck)}/{CONFIG.costCap}</span>{/if}
+      <button class="btn small edit" onclick={() => go({ name: 'decks', mode, back: opp.id })}>Edit deck</button>
+    </div>
+    <div class="slots" role="radiogroup" aria-label="Deck slot">
+      {#each Array(SLOTS) as _, i}
+        {@const d = save.decks[mode][i]}
+        {@const ok = !deckProblem(d, mode)}
+        <button
+          class="slot"
+          class:on={save.activeSlot[mode] === i}
+          role="radio"
+          aria-checked={save.activeSlot[mode] === i}
+          onclick={() => { save.activeSlot[mode] = i; persist(); }}
+        >
+          <span class="slot-name">Deck {i + 1}</span>
+          <span class="slot-state small" class:ready={ok}>{d.length ? (ok ? 'Ready' : `${d.length}/${CONFIG.deckSize[mode]}${mode === 4 && d.length === CONFIG.deckSize[mode] ? ' · over cap' : ''}`) : 'Empty'}</span>
+        </button>
+      {/each}
     </div>
     <div class="deck s{mode}">
       {#each Array(CONFIG.deckSize[mode]) as _, i}
@@ -206,6 +224,17 @@
   .deck-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; }
   .deck-head h3 { margin: 0; }
   .edit { margin-left: auto; }
+  .slots { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-bottom: 10px; }
+  .slot {
+    display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 6px 4px; border-radius: 10px;
+    border: 1px solid var(--line); background: rgb(0 0 0 / 0.2);
+    transition: border-color 160ms ease, background-color 160ms ease, transform 160ms var(--ease-out);
+  }
+  .slot:active { transform: scale(0.97); }
+  .slot.on { border-color: var(--gold); background: rgb(217 180 91 / 0.1); }
+  .slot-name { font-weight: 700; font-size: 0.88rem; }
+  .slot-state { color: var(--muted); }
+  .slot-state.ready { color: var(--ok); }
   .deck { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
   .deck.s4 { grid-template-columns: repeat(8, minmax(0, 1fr)); }
   @media (max-width: 520px) { .deck.s4 { grid-template-columns: repeat(4, minmax(0, 1fr)); } }

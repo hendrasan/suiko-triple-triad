@@ -3,9 +3,10 @@ import type { BoardSize } from '../core/types';
 
 export type Screen =
   | { name: 'map' }
-  | { name: 'prep'; opponent: string }
+  | { name: 'prep'; opponent: string; mode?: BoardSize }
   | { name: 'duel'; opponent: string; mode: BoardSize; seed: number }
-  | { name: 'decks'; mode?: BoardSize }
+  /** `back`: the opponent of the pre-duel screen that opened the deck builder. */
+  | { name: 'decks'; mode?: BoardSize; back?: string }
   | { name: 'collection' }
   | { name: 'tavern' }
   | { name: 'tutorial' }

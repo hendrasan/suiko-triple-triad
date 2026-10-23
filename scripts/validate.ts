@@ -16,12 +16,12 @@ const noArt = [
 ];
 console.log(noArt.length ? `Missing portraits (${noArt.length}): ${noArt.join(', ')}` : 'Portraits: all present.');
 
-console.log('Stat budgets by rarity:');
-for (const [rarity, b] of Object.entries(CONFIG.budgets)) {
-  const cards = CARDS.filter((c) => c.rarity === rarity);
+console.log('Stat budgets by tier:');
+for (const [tier, b] of Object.entries(CONFIG.budgets)) {
+  const cards = CARDS.filter((c) => c.tier === tier);
   const sums = cards.map((c) => c.values.reduce((a, v) => a + v, 0));
   const avg = sums.length ? (sums.reduce((a, v) => a + v, 0) / sums.length).toFixed(1) : '-';
-  console.log(`  ${rarity.padEnd(8)} ${String(cards.length).padStart(3)} cards  budget ${b.min}-${b.max}  avg ${avg}`);
+  console.log(`  ${tier.padEnd(8)} ${String(cards.length).padStart(3)} cards  budget ${b.min}-${b.max}  avg ${avg}`);
 }
 
 const runes: Record<string, number> = {};

@@ -2,7 +2,7 @@
   import { OPPONENT_BY_ID } from '../data/opponents';
   import { go } from '../stores/nav.svelte';
   import { CONFIG } from '../core/config';
-  import { RUNES, type BoardSize, type Rune } from '../core/types';
+  import { RUNES, type BoardSize, type Rune, type Tier } from '../core/types';
   import { BONDS } from '../data/bonds';
   import { CARD_BY_ID, starKind } from '../data/cards';
   import { SLOTS, defaultDeck } from '../stores/saveData';
@@ -18,6 +18,8 @@
   let mode = $state<BoardSize>(initialMode ?? 3);
   let rune = $state<Rune | 'all'>('all');
   let star = $state<'heavenly' | 'earthly' | 'all'>('all');
+  let tier = $state<Tier | 'all'>('all');
+  const TIERS: Tier[] = ['legend', 'elite', 'fighter', 'support', 'boss'];
   let sort = $state<'power' | 'star' | 'name'>('power');
   let query = $state('');
 
@@ -31,7 +33,7 @@
   const pool = $derived(
     save.owned
       .map((id) => CARD_BY_ID[id])
-      .filter((c) => (rune === 'all' || c.rune === rune) && (star === 'all' || starKind(c) === star) && matchesCard(c, query))
+      .filter((c) => (rune === 'all' || c.rune === rune) && (star === 'all' || starKind(c) === star) && (tier === 'all' || c.tier === tier) && matchesCard(c, query))
       .sort((a, b) =>
         sort === 'power' ? sum(b.id) - sum(a.id) : sort === 'name' ? a.name.localeCompare(b.name) : (a.starNo ?? 999) - (b.starNo ?? 999),
       ),
@@ -147,6 +149,9 @@
     <label class="small">Star
       <select bind:value={star}><option value="all">All</option><option value="heavenly">Heavenly</option><option value="earthly">Earthly</option></select>
     </label>
+    <label class="small">Tier
+      <select bind:value={tier}><option value="all">All</option>{#each TIERS as t}<option value={t}>{cap(t)}</option>{/each}</select>
+    </label>
     <label class="small">Sort
       <select bind:value={sort}><option value="power">Power</option><option value="star">Star no.</option><option value="name">Name</option></select>
     </label>
@@ -159,7 +164,7 @@
       <button class="poolcard" class:in={inDeck} class:partner={partners.length > 0} data-sfx={inDeck ? 'remove' : 'add'} onclick={() => toggle(c.id)} aria-pressed={inDeck}
         aria-label="{inDeck ? 'Remove' : 'Add'} {c.name}{partners.length ? `, bond with ${partners.join(', ')}` : ''}" title={partners.length ? `Bond with ${partners.join(', ')}` : undefined}>
         <Card id={c.id} showName />
-        <span class="cost">{CONFIG.costs[c.rarity]}</span>
+        <span class="cost">{CONFIG.costs[c.tier]}</span>
         {#if partners.length}<span class="bondtag" aria-hidden="true">⛓ Bond</span>{/if}
         {#if inDeck}<span class="check">✓</span>{/if}
       </button>
@@ -191,9 +196,11 @@
   .status.ok { border-color: var(--ok); color: var(--ok); }
   .bond.inactive strong { color: var(--muted); }
   .bond.inactive .link { color: var(--muted); }
+  /* Four equal columns, so the selects stay on one line on phones. */
+  .filters { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); max-width: 560px; }
   .filters label { display: flex; flex-direction: column; gap: 2px; color: var(--muted); }
   select {
-    min-height: 40px; border-radius: 8px; background: var(--panel); color: var(--text);
+    width: 100%; min-height: 40px; border-radius: 8px; background: var(--panel); color: var(--text);
     border: 1px solid var(--line); padding: 0 8px; font: inherit;
   }
   .none { margin: 0; text-align: center; }

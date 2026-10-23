@@ -3,7 +3,7 @@
 import { CONFIG } from '../core/config';
 import type { BoardSize } from '../core/types';
 import { BONDS } from './bonds';
-import { CARD_BY_ID, CARDS } from './cards';
+import { CARD_BY_ID, CARDS, starKind } from './cards';
 import { OPPONENT_BY_ID, OPPONENTS, REGIONS } from './opponents';
 import { BOND_RECRUITS, QUESTS, STARTERS, STORY_GATES } from './recruits';
 import { REPORTS } from './reports';
@@ -12,12 +12,11 @@ import type { Cond, OpponentDef } from './schema';
 export function checkBudgets(): string[] {
   const errs: string[] = [];
   for (const c of CARDS) {
-    const b = CONFIG.budgets[c.rarity];
+    const b = CONFIG.budgets[c.tier];
     const cut = c.ability ? CONFIG.abilityStatCost : 0;
     const sum = c.values.reduce((a, v) => a + v, 0);
     const [lo, hi] = [b.min - cut, b.max - cut];
-    if (sum < lo || sum > hi) errs.push(`${c.id}: sum ${sum} outside ${c.rarity}${cut ? ' + ability' : ''} budget ${lo}-${hi}`);
-    if (c.ability && c.rarity !== 'common') errs.push(`${c.id}: abilities are for Earthly Stars only`);
+    if (sum < lo || sum > hi) errs.push(`${c.id}: sum ${sum} outside ${c.tier}${cut ? ' + ability' : ''} budget ${lo}-${hi}`);
     if (c.values.some((v) => v < 1 || v > b.maxSide)) errs.push(`${c.id}: a value is outside 1-${b.maxSide}`);
   }
   return errs;
@@ -31,9 +30,6 @@ export function checkIntegrity(): string[] {
   if (stars.length !== 108) errs.push(`Expected 108 Stars, found ${stars.length}`);
   const nos = new Set(stars.map((c) => c.starNo));
   for (let i = 1; i <= 108; i++) if (!nos.has(i)) errs.push(`Missing star number ${i}`);
-  const heavenly = stars.filter((c) => c.starNo! <= 36);
-  if (heavenly.some((c) => c.rarity === 'common')) errs.push('A Heavenly Star is common');
-  if (stars.filter((c) => c.starNo! > 36).some((c) => c.rarity !== 'common')) errs.push('An Earthly Star is not common');
 
   for (const b of BONDS) for (const m of b.members) if (!has(m)) errs.push(`Bond ${b.id}: unknown card ${m}`);
   for (const b of BONDS) if (b.shape && (b.members.length < 3 || b.members.length > 4)) errs.push(`Bond ${b.id}: formations need 3-4 members`);
@@ -100,7 +96,7 @@ export function reachable(mode: BoardSize): Set<string> {
     switch (c.t) {
       case 'withCard': return owned.has(c.id);
       case 'withRune': return c.n <= deckSize && ownedCards.filter((x) => x.rune === c.rune).length >= c.n;
-      case 'allCommon': return ownedCards.filter((x) => x.rarity === 'common').length >= deckSize;
+      case 'allEarthly': return ownedCards.filter((x) => starKind(x) === 'earthly').length >= deckSize;
       case 'runeTile': return opps.some((o) => o.tiles[mode].some(([, r]) => !c.rune || r === c.rune))
         && ownedCards.some((x) => !c.rune || x.rune === c.rune);
       case 'score': return c.n <= mode * mode + (mode === 3 ? 1 : 0);

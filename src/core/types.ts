@@ -6,8 +6,8 @@ export const RUNES: Rune[] = ['fire', 'water', 'wind', 'earth', 'lightning'];
 /** Passive card abilities. Only some Earthly Stars have one. */
 export type Ability = 'steadfast' | 'rally' | 'sabotage' | 'runeborn';
 
-/** 'rare' = Heavenly Star, 'common' = Earthly Star, 'special' = Hero/Jowy, 'boss' = Luca. */
-export type Rarity = 'common' | 'rare' | 'special' | 'boss';
+/** Power tier: sets the cost and the stat budget. Heavenly / Earthly is only flavor (see starKind). */
+export type Tier = 'support' | 'fighter' | 'elite' | 'legend' | 'boss';
 
 /** [top, right, bottom, left]. 1..10, 10 is shown as "A". */
 export type Values = [number, number, number, number];
@@ -24,7 +24,7 @@ export interface CardDef {
   starName?: string;
   /** Number 109+ for extra cards that are not one of the 108 (Kasumi, Sigfried, ...). */
   extraNo?: number;
-  rarity: Rarity;
+  tier: Tier;
   values: Values;
   rune: Rune;
   ability?: Ability;

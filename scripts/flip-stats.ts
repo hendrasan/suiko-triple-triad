@@ -7,7 +7,7 @@ import { makeRng, shuffle } from '../src/core/rng';
 import { BONDS } from '../src/data/bonds';
 import { CARDS } from '../src/data/cards';
 import { OPPONENTS } from '../src/data/opponents';
-const pool = CARDS.filter((c) => c.rarity === 'common' || c.rarity === 'rare').map((c) => c.id);
+const pool = CARDS.filter((c) => c.tier !== 'legend' && c.tier !== 'boss').map((c) => c.id);
 const out: Record<string, { won: number; f: number[] }> = {};
 let seed = 1;
 for (const mode of [3, 4] as const) {

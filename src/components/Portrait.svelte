@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { CardDef } from '../core/types';
+  import { starKind } from '../data/cards';
   import { cardPortrait } from '../data/portraits';
 
   let { card }: { card: CardDef } = $props();
@@ -14,7 +15,7 @@
   const initials = $derived(
     card.name.replace(/[^A-Za-z ]/g, ' ').split(' ').filter(Boolean).map((w) => w[0]).join('').slice(0, 2).toUpperCase(),
   );
-  const heavenly = $derived(card.rarity !== 'common');
+  const heavenly = $derived(starKind(card) !== 'earthly');
 </script>
 
 {#if !failed}

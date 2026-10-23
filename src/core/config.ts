@@ -1,4 +1,4 @@
-import type { BoardSize, Rarity, Rules } from './types';
+import type { BoardSize, Rules, Tier } from './types';
 
 // All tunable numbers live here. Change values, not code.
 export const CONFIG = {
@@ -31,14 +31,15 @@ export const CONFIG = {
   deckSize: { 3: 5, 4: 8 } as Record<BoardSize, number>,
   /** Quad Quartet deck cost cap. Triple Triad has no cap. */
   costCap: 30,
-  costs: { common: 2, rare: 4, special: 5, boss: 5 } as Record<Rarity, number>,
-  /** Stat budget per rarity: sum of the four values, and the highest single value. */
+  costs: { support: 2, fighter: 3, elite: 4, legend: 5, boss: 5 } as Record<Tier, number>,
+  /** Stat budget per tier: sum of the four values, and the highest single value. */
   budgets: {
-    common: { min: 14, max: 20, maxSide: 8 },
-    rare: { min: 20, max: 26, maxSide: 9 },
-    special: { min: 26, max: 28, maxSide: 10 },
+    support: { min: 14, max: 17, maxSide: 7 },
+    fighter: { min: 17, max: 20, maxSide: 8 },
+    elite: { min: 21, max: 23, maxSide: 9 },
+    legend: { min: 24, max: 28, maxSide: 10 },
     boss: { min: 28, max: 31, maxSide: 10 },
-  } as Record<Rarity, { min: number; max: number; maxSide: number }>,
+  } as Record<Tier, { min: number; max: number; maxSide: number }>,
   runeTileCount: { 3: [1, 2], 4: [3, 4] } as Record<BoardSize, [number, number]>,
   /** AI time budget per move, ms. */
   aiTimeMs: 350,

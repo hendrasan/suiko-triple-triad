@@ -65,7 +65,7 @@ export function activeDeck(mode: BoardSize): string[] {
 }
 
 export function deckCost(deck: string[]): number {
-  return deck.reduce((a, id) => a + CONFIG.costs[CARD_BY_ID[id].rarity], 0);
+  return deck.reduce((a, id) => a + CONFIG.costs[CARD_BY_ID[id].tier], 0);
 }
 
 /** Null when the deck is legal, otherwise the reason. */

@@ -126,8 +126,8 @@
             <p class="blurb">{open.blurb}</p>
             <div class="row small">
               <span class="chip"><RuneIcon rune={open.rune} size={12} /> {cap(open.rune)}</span>
-              <span class="chip">{cap(open.rarity)}</span>
-              <span class="chip">Cost {CONFIG.costs[open.rarity]}</span>
+              <span class="chip">{cap(open.tier)}</span>
+              <span class="chip">Cost {CONFIG.costs[open.tier]}</span>
               <span class="chip">Total {open.values.reduce((a, v) => a + v, 0)}</span>
               {#if save.via[open.id]}<span class="chip">{VIA[save.via[open.id]] ?? save.via[open.id]}</span>{/if}
             </div>

@@ -40,6 +40,15 @@ Card and opponent art is in `public/portraits/<file>.webp`. The default file nam
 - **Rune tiles**: matching rune +1 on all sides, other rune −1. Values stay in 1–10.
 - **Bonds**: a card that touches an allied bond partner gets +1 on **all** sides (one bonus at most). See assumption 1.
 - **Unite Attack**: when a formation (3–4 bonded cards in the bond's shape) is complete, the owner flips the adjacent enemy card with the lowest touching value. Once per duel per side. No chain. Shapes: **Line** (one straight row or column), **Group** (`connected` in data: all touching, any shape), **Square** (2×2). Player-facing text is in `src/data/formations.ts`.
+- **Power tiers** (`TIER` in `src/data/cards.ts`, numbers in `config.ts`). Heavenly and Earthly are only flavor. A card's power comes from its tier, based on the character in Suikoden II. Inside a tier, cards that join later in the story have more stat points. The card frame shows the tier.
+
+  | Tier | Cost | Stat total | Who |
+  | --- | --- | --- | --- |
+  | Support (bronze) | 2 | 14–17 | Non-fighters: headquarters and shops |
+  | Fighter (silver) | 3 | 17–20 | Party fighters |
+  | Elite (gold) | 4 | 21–23 | The strongest fighters and the great commanders |
+  | Legend (bright gold) | 5 | 24–28 | Hero, Jowy, Luc, Sierra, Georg Prime, Pesmerga |
+  | Boss (red) | 5 | 28–31 | Luca Blight |
 - **Abilities** (20 Earthly Stars and 3 extra cards, icon in the bottom-left corner of the card). A card with an ability has 2 fewer stat points (`abilityStatCost`).
   - **Steadfast** (Hans, Gantetsu, Barbara, Maximillian, Gadget, Rulodia): Same, Plus, and Combo cannot flip it. Normal flips and Unite Attacks can.
   - **Rally** (Leona, Annallee, Connell, Huan, Apple): allied cards next to it get +1 on all sides (at most +1). The bonus follows the card's current owner.
@@ -67,7 +76,7 @@ Recruit Richmond (the detective, a quest recruit in South Window & Two River) to
 3. **Unite Attack** flips the enemy card with the lowest touching value (ties: lowest total, then board order).
 4. **"Win without losing a card"** means the opponent never flipped any of your cards in the match.
 5. **Losing a duel costs no cards.** Only the winner claims a prize.
-6. **108 Stars + 4 extra cards (109 Kasumi, 110 Sigfried, 111 Chuchara, 112 Rulodia) + 2 story cards (Jowy, Luca) = 114 cards.** In the game, Kasumi and Sigfried are alternates for a star slot; Chuchara and Rulodia are Abizboah's family. Boris is not a card. The Hero is 'special' (cost 5) but stays Star 1.
+6. **108 Stars + 4 extra cards (109 Kasumi, 110 Sigfried, 111 Chuchara, 112 Rulodia) + 2 story cards (Jowy, Luca) = 114 cards.** In the game, Kasumi and Sigfried are alternates for a star slot; Chuchara and Rulodia are Abizboah's family. Boris is not a card. The Hero is a Legend (cost 5) and stays Star 1.
 7. **Rune affinities** are game design, not canon.
 8. **Opponents in Triple Triad** use a seeded 5 of their 8 cards.
 9. **Tavern** shows 3 rumors, plus one more per win.

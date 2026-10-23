@@ -1,5 +1,5 @@
 // Recruiting and progression rules. Pure: takes the owned set and returns what changes.
-import { CARD_BY_ID } from '../data/cards';
+import { CARD_BY_ID, starKind } from '../data/cards';
 import { OPPONENT_BY_ID, OPPONENTS } from '../data/opponents';
 import { BOND_RECRUITS, QUESTS, STORY_GATES } from '../data/recruits';
 import type { Cond, OpponentDef, RegionDef } from '../data/schema';
@@ -14,7 +14,7 @@ export function condMet(c: Cond, s: MatchSummary, opp: OpponentDef): boolean {
   switch (c.t) {
     case 'withCard': return s.deck.includes(c.id);
     case 'withRune': return deck.filter((d) => d.rune === c.rune).length >= c.n;
-    case 'allCommon': return deck.every((d) => d.rarity === 'common');
+    case 'allEarthly': return deck.every((d) => starKind(d) === 'earthly');
     case 'flawless': return s.flawless;
     case 'flips': return s.flipsMax >= c.n;
     case 'same': return s.same;

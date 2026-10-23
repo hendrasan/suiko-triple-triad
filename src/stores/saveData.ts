@@ -44,7 +44,7 @@ export function defaultDeck(owned: string[], mode: BoardSize): string[] {
   let cost = 0;
   for (const id of sorted) {
     if (deck.length >= CONFIG.deckSize[mode]) break;
-    const c = CONFIG.costs[CARD_BY_ID[id].rarity];
+    const c = CONFIG.costs[CARD_BY_ID[id].tier];
     if (mode === 4 && cost + c > CONFIG.costCap) continue;
     deck.push(id);
     cost += c;

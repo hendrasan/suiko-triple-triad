@@ -47,7 +47,7 @@ export interface OpponentDef {
 export type Cond =
   | { t: 'withCard'; id: string }
   | { t: 'withRune'; rune: Rune; n: number }
-  | { t: 'allCommon' }
+  | { t: 'allEarthly' }
   | { t: 'flawless' }
   | { t: 'flips'; n: number }
   | { t: 'same' }

@@ -52,7 +52,7 @@
 
 <div class="wrap" class:named={showName}>
   <div
-    class="card {def?.rarity ?? ''}"
+    class="card {def?.tier ?? ''}"
     class:p0={owner === 0}
     class:p1={owner === 1}
     class:back={faceDown}
@@ -103,18 +103,19 @@
     box-shadow: 0 2px 6px rgb(0 0 0 / 0.5);
     user-select: none;
   }
-  /* Rarity frames */
-  .card.common { border-color: #7a6450; }
-  .card.rare { border-color: #c9cfd8; box-shadow: 0 0 0 1px #6c7480, 0 2px 8px rgb(0 0 0 / 0.5); }
-  .card.special { border-color: var(--gold); box-shadow: 0 0 0 1px #6d5420, 0 0 10px rgb(217 180 91 / 0.35); }
+  /* Tier frames: bronze, silver, gold, bright gold, red */
+  .card.support { border-color: #7a6450; }
+  .card.fighter { border-color: #c9cfd8; box-shadow: 0 0 0 1px #6c7480, 0 2px 8px rgb(0 0 0 / 0.5); }
+  .card.elite { border-color: var(--gold); box-shadow: 0 0 0 1px #6d5420, 0 2px 8px rgb(0 0 0 / 0.5); }
+  .card.legend { border-color: var(--gold-2); box-shadow: 0 0 0 1px #6d5420, 0 0 10px rgb(217 180 91 / 0.45); }
   .card.boss { border-color: #b3261e; box-shadow: 0 0 0 1px #3a0d0a, 0 0 12px rgb(179 38 30 / 0.45); }
-  .card.rare::after, .card.special::after, .card.boss::after {
+  .card.elite::after, .card.legend::after, .card.boss::after {
     content: ''; position: absolute; inset: 0; pointer-events: none;
     background: linear-gradient(115deg, transparent 35%, rgb(255 255 255 / 0.22) 50%, transparent 65%);
     background-size: 250% 100%;
     animation: shine 4.5s ease-in-out infinite;
   }
-  .card.special::after { background-image: linear-gradient(115deg, transparent 35%, rgb(255 225 140 / 0.35) 50%, transparent 65%); animation-duration: 3s; }
+  .card.legend::after { background-image: linear-gradient(115deg, transparent 35%, rgb(255 225 140 / 0.35) 50%, transparent 65%); animation-duration: 3s; }
   .card.boss::after { background-image: linear-gradient(115deg, transparent 35%, rgb(255 120 100 / 0.3) 50%, transparent 65%); animation-duration: 3s; }
   @keyframes shine { 0%, 60% { background-position: 150% 0; } 100% { background-position: -100% 0; } }
 

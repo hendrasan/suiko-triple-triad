@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applyMove, createGame, isOver, score, sideValue } from '../src/core/engine';
+import { applyMove, createGame, isOver, score, sideValue, teleport } from '../src/core/engine';
 import { BASE_RULES, CONFIG } from '../src/core/config';
 import type { BondDef, BoardSize, GameState, HandCard, Rules, Rune, Side, Values } from '../src/core/types';
 
@@ -340,5 +340,60 @@ describe('abilities', () => {
     });
     expect(sideValue(s, 4, 0)).toBe(7);
     expect(sideValue(s, 0, 0)).toBe(5);
+  });
+});
+
+describe('teleport (Viki)', () => {
+  const viki = (): HandCard => ({ ...card([2, 9, 9, 2], 'viki'), ability: 'teleport' });
+  /** Viki (player) at cell 0, a weak enemy at cell 8, and the player to move. */
+  const board = (seed?: number) => {
+    const s = setup({ board: { 0: [viki(), 0], 8: [card(flat(1)), 1] }, hand0: [card(flat(5))], hand1: [card(flat(5))] });
+    s.seed = seed;
+    return s;
+  };
+  /** First seed in 0..999 that makes Viki jump in this position. */
+  const jumpSeed = () => {
+    for (let seed = 0; seed < 1000; seed++) if (teleport(board(seed))) return seed;
+    throw new Error('no jump');
+  };
+
+  it('never jumps without a seed (AI search, tests)', () => {
+    expect(teleport(board())).toBeNull();
+  });
+
+  it('jumps about one time in four', () => {
+    let n = 0;
+    for (let seed = 0; seed < 2000; seed++) if (teleport(board(seed))) n++;
+    expect(n / 2000).toBeGreaterThan(0.2);
+    expect(n / 2000).toBeLessThan(0.3);
+  });
+
+  it('moves to an empty cell, gives the same result for the same seed, and keeps the turn', () => {
+    const seed = jumpSeed();
+    const a = teleport(board(seed))!;
+    const b = teleport(board(seed))!;
+    expect(a.teleport.to).toBe(b.teleport.to);
+    expect(a.teleport.from).toBe(0);
+    expect(a.state.board[0]).toBeNull();
+    expect(a.state.board[a.teleport.to]!.card.id).toBe('viki');
+    expect(a.state.turn).toBe(0);
+  });
+
+  it('flips weaker neighbors on arrival with the basic rule', () => {
+    // Fill every empty cell except 5 (next to the weak enemy at 8), so the jump must land on 5.
+    const s = board(0);
+    for (const cell of [1, 2, 3, 4, 6, 7]) s.board[cell] = { card: card(flat(9)), owner: 0 };
+    let r = null;
+    for (let seed = 0; seed < 1000 && !r; seed++) r = teleport({ ...s, seed });
+    expect(r!.teleport.to).toBe(5);
+    // Viki's bottom side (9) faces the enemy's top side (1).
+    expect(r!.teleport.flips).toEqual([{ cell: 8, cause: 'basic', step: 1, to: 0 }]);
+    expect(r!.state.board[8]!.owner).toBe(0);
+  });
+
+  it('does not jump on the turn of the other side', () => {
+    const s = board(jumpSeed());
+    s.turn = 1;
+    expect(teleport(s)).toBeNull();
   });
 });

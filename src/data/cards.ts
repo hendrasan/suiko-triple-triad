@@ -131,6 +131,7 @@ const ABILITY: Record<string, Ability> = {
   hoi: 'sabotage', shilo: 'sabotage', sasuke: 'sabotage', koyu: 'sabotage', 'lo-wen': 'sabotage',
   jeane: 'runeborn', mazus: 'runeborn', lorelai: 'runeborn', tomo: 'runeborn', tetsu: 'runeborn',
   kasumi: 'sabotage', chuchara: 'runeborn', rulodia: 'steadfast',
+  viki: 'teleport', // free: see CONFIG.freeAbilities
 };
 
 // Power tiers, from the character's strength in Suikoden II (party fighter, great commander, or support).

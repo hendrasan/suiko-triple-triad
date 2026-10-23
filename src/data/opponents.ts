@@ -101,7 +101,7 @@ export const OPPONENTS: OpponentDef[] = [
   {
     id: 'gorudo', portrait: 'gorudo', name: 'Gorudo', title: 'Lord of Matilda', region: 'rockaxe', boss: true,
     intro: '“Refugees, rebels, they are all the same to me. No one passes my border. But a game? Oh, we\'re going to enjoy this.”',
-    deck: ['kiba', 'klaus', 'camus', 'miklotov', 'viki', 'sheena', 'lorelai', 'futch'],
+    deck: ['kiba', 'klaus', 'camus', 'miklotov', 'humphrey', 'sheena', 'lorelai', 'futch'],
     rules: rules({ same: true, plus: true, combo: true }), format: 'bo2', prize: 'choose', difficulty: 'hard', personality: 'aggressive',
     tiles: { 3: [[4, 'lightning']], 4: [[5, 'lightning'], [6, 'lightning'], [9, 'lightning'], [10, 'lightning']] },
     faction: 'city-states',

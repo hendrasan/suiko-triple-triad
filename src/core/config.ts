@@ -1,4 +1,4 @@
-import type { BoardSize, Rules, Tier } from './types';
+import type { Ability, BoardSize, Rules, Tier } from './types';
 
 // All tunable numbers live here. Change values, not code.
 export const CONFIG = {
@@ -28,6 +28,10 @@ export const CONFIG = {
   sabotagePenalty: 1,
   /** A card with an ability has this many fewer stat points in its budget. */
   abilityStatCost: 2,
+  /** Abilities that cost no stat points, because they are high risk, high reward. */
+  freeAbilities: ['teleport'] as Ability[],
+  /** Teleport (Viki): chance per turn of her owner that she jumps to a random empty cell. */
+  teleportChance: 0.25,
   deckSize: { 3: 5, 4: 8 } as Record<BoardSize, number>,
   /** Quad Quartet deck cost cap. Triple Triad has no cap. */
   costCap: 30,

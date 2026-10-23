@@ -1,7 +1,7 @@
 // Sound effects (ZzFX: generated, no audio files) and motion helpers.
 import { save } from '../stores/save.svelte';
 
-export type Sfx = 'select' | 'place' | 'flip' | 'same' | 'plus' | 'combo' | 'unite' | 'sabotage' | 'win' | 'lose' | 'draw'
+export type Sfx = 'select' | 'place' | 'flip' | 'same' | 'plus' | 'combo' | 'unite' | 'sabotage' | 'teleport' | 'win' | 'lose' | 'draw'
   | 'click' | 'nav' | 'open' | 'back' | 'add' | 'remove';
 
 type Params = (number | undefined)[];
@@ -22,6 +22,8 @@ const SOUNDS: Record<Exclude<Sfx, 'win' | 'lose' | 'draw'>, Params> = {
   plus: [0.9, 0.03, 392, 0.02, 0.12, 0.35, 1, 1.5, , , 392, 0.08, , , , , 0.06, 0.8],
   combo: [0.8, 0.03, 600, 0.01, 0.06, 0.18, 2, 1.4, 6, , 300, 0.05, , , , , 0.04, 0.7],
   sabotage: [0.8, 0.05, 300, 0.01, 0.05, 0.2, 3, 2, -12, , , , , 0.6, , 0.1],
+  // A rising sweep with a little noise: a sneeze and a jump.
+  teleport: [0.8, 0.05, 260, 0.02, 0.08, 0.3, 0, 1.6, 24, , , , , 0.3, , , 0.05, 0.6],
   unite: [1.3, 0.05, 110, 0.04, 0.3, 0.6, 2, 1.2, 3, , 165, 0.12, 0.08, , , , 0.12, 0.7, 0.1],
 };
 const JINGLES: Record<'win' | 'lose' | 'draw', number[]> = {

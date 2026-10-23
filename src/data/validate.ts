@@ -13,7 +13,7 @@ export function checkBudgets(): string[] {
   const errs: string[] = [];
   for (const c of CARDS) {
     const b = CONFIG.budgets[c.tier];
-    const cut = c.ability ? CONFIG.abilityStatCost : 0;
+    const cut = c.ability && !CONFIG.freeAbilities.includes(c.ability) ? CONFIG.abilityStatCost : 0;
     const sum = c.values.reduce((a, v) => a + v, 0);
     const [lo, hi] = [b.min - cut, b.max - cut];
     if (sum < lo || sum > hi) errs.push(`${c.id}: sum ${sum} outside ${c.tier}${cut ? ' + ability' : ''} budget ${lo}-${hi}`);

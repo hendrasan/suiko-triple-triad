@@ -1,8 +1,9 @@
 // Pure rules engine. No UI imports. Used by the duel UI, the AI worker, and the tests.
 import { CONFIG } from './config';
+import { makeRng } from './rng';
 import type {
   BoardSize, BondDef, FlipCause, FlipEvent, Formation, GameState, HandCard, Move, MoveResult,
-  PlacedCard, Rune, Rules, Side,
+  PlacedCard, Rune, Rules, Side, Teleport,
 } from './types';
 
 /** Directions: 0 top, 1 right, 2 bottom, 3 left. */
@@ -25,6 +26,8 @@ export interface NewGame {
   hands: [HandCard[], HandCard[]];
   first: Side;
   bonds: BondDef[];
+  /** Duel seed. Only needed for Teleport. */
+  seed?: number;
 }
 
 export function createGame(g: NewGame): GameState {
@@ -55,6 +58,7 @@ export function createGame(g: NewGame): GameState {
     bondMap,
     formations,
     uniteUsed: [false, false],
+    seed: g.seed,
   };
 }
 
@@ -231,6 +235,39 @@ function uniteTargets(s: GameState, side: Side, cells: number[]): number[] {
   }
   const total = (n: number) => DIRS.reduce((a: number, d) => a + sideValue(s, n, d), 0);
   return [...best.keys()].sort((a, b) => best.get(a)! - best.get(b)! || total(a) - total(b) || a - b);
+}
+
+// ---------- Teleport (Viki) ----------
+
+/** A roll in [0, 1) from the duel seed, the move number, and a salt. The same duel gives the same rolls. */
+const roll = (seed: number, moveNo: number, salt: number) => makeRng(seed + moveNo * 7919 + salt * 104729)();
+
+/**
+ * Start of a turn: a Teleport card of the side to move may jump to a random empty cell
+ * (CONFIG.teleportChance). On arrival it flips weaker neighbors with the basic rule only.
+ * Returns null when nothing happens. Needs `state.seed`, so the AI search never sees a jump.
+ */
+export function teleport(state: GameState): { state: GameState; teleport: Teleport } | null {
+  if (state.seed === undefined) return null;
+  const me = state.turn;
+  const from = state.board.findIndex((p) => p !== null && p.owner === me && p.card.ability === 'teleport');
+  const empty = emptyCells(state);
+  if (from < 0 || !empty.length || roll(state.seed, state.moveNo, 1) >= CONFIG.teleportChance) return null;
+  const to = empty[Math.floor(roll(state.seed, state.moveNo, 2) * empty.length)];
+
+  const s = clone(state);
+  s.board[to] = s.board[from];
+  s.board[from] = null;
+  // Compare every side first, then flip, the same as a placement.
+  const targets = DIRS.map((d) => neighbor(s.size, to, d)).filter((n, d) => {
+    const q = n >= 0 ? s.board[n] : null;
+    return !!q && q.owner !== me && sideValue(s, to, d) > sideValue(s, n, opposite(d));
+  });
+  const flips: FlipEvent[] = targets.map((cell) => {
+    (s.board[cell] as PlacedCard).owner = me;
+    return { cell, cause: 'basic', step: 1, to: me };
+  });
+  return { state: s, teleport: { from, to, owner: me, flips } };
 }
 
 // ---------- Placement ----------

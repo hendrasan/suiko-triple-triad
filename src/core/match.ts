@@ -3,7 +3,7 @@ import { CARD_BY_ID } from '../data/cards';
 import type { OpponentDef } from '../data/schema';
 import { CONFIG } from './config';
 import { makeRng, shuffle } from './rng';
-import type { BoardSize, GameState, HandCard, Move, MoveResult, Rune, Side } from './types';
+import type { BoardSize, GameState, HandCard, Move, MoveResult, Rune, Side, Teleport } from './types';
 
 export function toHand(ids: string[], side: Side): HandCard[] {
   return ids.map((id, i) => {
@@ -87,6 +87,11 @@ export function record(log: GameLog, before: GameState, move: Move, r: MoveResul
   for (const b of r.bonds) if (!log.bonds.includes(b)) log.bonds.push(b);
   const tile = before.tiles[move.cell];
   if (before.rules.runes && tile && tile === card.rune && !log.runeTiles.includes(tile)) log.runeTiles.push(tile);
+}
+
+/** Teleport flips are not a move: they only count as cards lost when the opponent's Viki jumps. */
+export function recordTeleport(log: GameLog, t: Teleport): void {
+  if (t.owner === 1) log.lost += t.flips.length;
 }
 
 // ---------- Match summary ----------

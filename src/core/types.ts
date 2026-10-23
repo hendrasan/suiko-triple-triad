@@ -3,8 +3,8 @@
 export type Rune = 'fire' | 'water' | 'wind' | 'earth' | 'lightning';
 export const RUNES: Rune[] = ['fire', 'water', 'wind', 'earth', 'lightning'];
 
-/** Passive card abilities. Only some Earthly Stars have one. */
-export type Ability = 'steadfast' | 'rally' | 'sabotage' | 'runeborn';
+/** Card abilities. Teleport is Viki's own: a random jump at the start of her owner's turn. */
+export type Ability = 'steadfast' | 'rally' | 'sabotage' | 'runeborn' | 'teleport';
 
 /** Power tier: sets the cost and the stat budget. Heavenly / Earthly is only flavor (see starKind). */
 export type Tier = 'support' | 'fighter' | 'elite' | 'legend' | 'boss';
@@ -97,6 +97,8 @@ export interface GameState {
   bondMap: Record<string, string[]>;
   formations: Formation[];
   uniteUsed: [boolean, boolean];
+  /** Duel seed for the Teleport roll. Without it, nothing teleports (AI search, tests, tutorial). */
+  seed?: number;
 }
 
 export interface Move {
@@ -122,4 +124,12 @@ export interface MoveResult {
   unite: string | null;
   /** The cell and side that Sabotage weakened, if any. */
   sabotage: { cell: number; side: number } | null;
+}
+
+/** A Teleport jump at the start of `owner`'s turn, and the basic flips it made on arrival. */
+export interface Teleport {
+  from: number;
+  to: number;
+  owner: Side;
+  flips: FlipEvent[];
 }

@@ -1,16 +1,16 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
   import { askAI } from '../ai/client';
-  import { applyMove, createGame, isOver, previewValues, runeMod, score } from '../core/engine';
+  import { applyMove, createGame, isOver, previewValues, runeMod, score, teleport } from '../core/engine';
   import { cap } from '../lib/text';
   import {
-    aiBoostPick, boostCard, newLog, opponentDeck, record, setupGame, summarize, tilesFor,
+    aiBoostPick, boostCard, newLog, opponentDeck, record, recordTeleport, setupGame, summarize, tilesFor,
     type GameLog, type GameSetup, type MatchSummary,
   } from '../core/match';
   import { bondRecruits, prizeOptions, recruitsFromMatch, secretsOpen, type Recruit } from '../core/progress';
   import { REPORTS } from '../data/reports';
   import { makeRng } from '../core/rng';
-  import type { BoardSize, FlipCause, GameState, Move, Side } from '../core/types';
+  import type { BoardSize, FlipCause, FlipEvent, GameState, Move, Side } from '../core/types';
   import { BONDS } from '../data/bonds';
   import { CARD_BY_ID } from '../data/cards';
   import { OPPONENT_BY_ID } from '../data/opponents';
@@ -72,7 +72,8 @@
   function makeGame(s: GameSetup): GameState {
     let hands = s.hands;
     if (s.handicap === 1) hands = [hands[0], boostCard(hands[1], aiBoostPick(hands[1]))];
-    return createGame({ size: mode, rules: opp.rules, tiles: tilesFor(opp, mode), hands, first: s.first, bonds: BONDS });
+    // The seed only drives Teleport rolls. Game 2 gets its own rolls.
+    return createGame({ size: mode, rules: opp.rules, tiles: tilesFor(opp, mode), hands, first: s.first, bonds: BONDS, seed: seed + 1013 * gameNo });
   }
 
   function begin() {
@@ -90,9 +91,73 @@
     next();
   }
 
-  function next() {
+  async function next() {
     if (isOver(game)) return endGame();
+    // Start of the turn: Viki may teleport before the side to move acts.
+    const t = teleport(game);
+    if (t) {
+      busy = true;
+      const name = CARD_BY_ID[game.board[t.teleport.from]!.card.id].name;
+      const fast = save.settings.skipAnimations;
+      if (!fast) {
+        banner = `${name} sneezed!`;
+        sfx('teleport');
+        await wait(700);
+        if (!alive) return;
+        banner = null;
+      }
+      recordTeleport(log, t.teleport);
+      hideFlipped(t.teleport.flips, game);
+      game = t.state;
+      lastPlaced = t.teleport.to;
+      // Her old cell is empty now: forget its flip count, so the next card there drops in normally.
+      const k = { ...flipKeys };
+      delete k[t.teleport.from];
+      flipKeys = k;
+      if (!(await showFlips(t.teleport.flips, null))) return;
+      busy = false;
+    }
     if (game.turn === 1) runAI();
+  }
+
+  /** Flipped cards keep their old color until their flip step plays. */
+  function hideFlipped(flips: FlipEvent[], before: GameState) {
+    const hide: Record<number, Side> = {};
+    for (const f of flips) hide[f.cell] ??= before.board[f.cell]!.owner;
+    hidden = hide;
+  }
+
+  /** Plays the flip steps in order. Returns false when the duel screen is gone. */
+  async function showFlips(flips: FlipEvent[], unite: string | null): Promise<boolean> {
+    const fast = save.settings.skipAnimations;
+    const steps = [...new Set(flips.map((f) => f.step))].sort((a, b) => a - b);
+    for (const step of steps) {
+      const group = flips.filter((f) => f.step === step);
+      const special = group.find((f) => f.cause !== 'basic');
+      if (!fast) await wait(step === 1 ? 200 : 280);
+      if (!alive) return false;
+      if (special && !fast) {
+        banner = special.cause === 'unite' && unite ? `Unite Attack · ${bondName(unite)}` : LABEL[special.cause];
+        sfx(special.cause === 'basic' ? 'flip' : special.cause, step);
+      }
+      const h = { ...hidden };
+      const k = { ...flipKeys };
+      for (const f of group) {
+        delete h[f.cell];
+        k[f.cell] = (k[f.cell] ?? 0) + 1;
+      }
+      hidden = h;
+      if (!fast) {
+        flipKeys = k;
+        if (!special) sfx(step > 1 ? 'combo' : 'flip', step);
+      }
+      if (special && !fast) {
+        await wait(600);
+        banner = null;
+      }
+    }
+    if (!fast) await wait(flips.length ? 260 : 120);
+    return alive;
   }
 
   async function runAI() {
@@ -115,9 +180,7 @@
     selected = null;
     aim = null;
     hint = '';
-    const hide: Record<number, Side> = {};
-    for (const f of r.flips) hide[f.cell] ??= before.board[f.cell]!.owner;
-    hidden = hide;
+    hideFlipped(r.flips, before);
     game = r.state;
     lastPlaced = move.cell;
     sfx('place');
@@ -130,34 +193,7 @@
       await wait(500);
       banner = null;
     }
-    const steps = [...new Set(r.flips.map((f) => f.step))].sort((a, b) => a - b);
-    for (const step of steps) {
-      const group = r.flips.filter((f) => f.step === step);
-      const special = group.find((f) => f.cause !== 'basic');
-      if (!fast) await wait(step === 1 ? 200 : 280);
-      if (!alive) return;
-      if (special && !fast) {
-        banner = special.cause === 'unite' && r.unite ? `Unite Attack · ${bondName(r.unite)}` : LABEL[special.cause];
-        sfx(special.cause === 'basic' ? 'flip' : special.cause, step);
-      }
-      const h = { ...hidden };
-      const k = { ...flipKeys };
-      for (const f of group) {
-        delete h[f.cell];
-        k[f.cell] = (k[f.cell] ?? 0) + 1;
-      }
-      hidden = h;
-      if (!fast) {
-        flipKeys = k;
-        if (!special) sfx(step > 1 ? 'combo' : 'flip', step);
-      }
-      if (special && !fast) {
-        await wait(600);
-        banner = null;
-      }
-    }
-    if (!fast) await wait(r.flips.length ? 260 : 120);
-    if (!alive) return;
+    if (!(await showFlips(r.flips, r.unite))) return;
     busy = false;
     next();
   }

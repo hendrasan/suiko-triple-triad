@@ -35,13 +35,13 @@
     <ul class="rumors">
       {#each heard as r, i}
         <li class="rumor rise" class:bond={r.kind === 'bond'} style="--i:{Math.min(i + 2, 10)}">
-          <span class="tag">{r.kind === 'bond' ? '⛓ ' : ''}{speakerFor(r.id)}</span>
+          <span class="plate">{r.kind === 'bond' ? '⛓ ' : ''}{speakerFor(r.id)}</span>
           <p>{r.text}</p>
         </li>
       {/each}
       {#if heard.length < list.length}
         <li class="rumor teaser rise" style="--i:{Math.min(heard.length + 2, 10)}">
-          <span class="tag">Stranger in the corner</span>
+          <span class="plate">Stranger in the corner</span>
           <p>…He isn't talking yet. Win another duel and come back.</p>
         </li>
       {/if}
@@ -74,23 +74,25 @@
   .bar { height: 6px; border-radius: 999px; background: rgb(255 255 255 / 0.08); overflow: hidden; }
   .bar span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--gold), var(--gold-2)); transition: width 400ms var(--ease-out); }
 
-  .rumors { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  /* Room above each box for its name plate. */
+  .rumors { list-style: none; margin: 0; padding: 14px 0 0; display: grid; gap: 36px 16px; }
   @media (min-width: 720px) { .rumors { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   .rumor {
-    position: relative; padding: 14px 16px 14px; border-radius: var(--radius);
-    background: linear-gradient(160deg, #2e251c, #231c16);
-    border: 1px solid var(--line); border-left: 3px solid var(--gold);
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.04);
+    position: relative; padding: 20px 16px 14px; border-radius: 4px;
+    background: rgb(14 20 22 / 0.9); border: 1px solid rgb(255 255 255 / 0.28);
+    box-shadow: 0 6px 18px rgb(0 0 0 / 0.35);
   }
-  .rumor.bond { border-left-color: #8fb3d9; }
-  .rumor p { margin: 0; font-family: var(--font-title); font-style: italic; font-size: 1.02rem; line-height: 1.45; }
-  .tag {
-    display: inline-block; margin-bottom: 6px; font-size: 0.68rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
-    color: var(--gold);
+  .rumor p { margin: 0; font-size: 1rem; line-height: 1.5; color: #f2efe8; }
+  /* NPC name plate */
+  .plate {
+    position: absolute; top: -13px; left: 10px; padding: 2px 12px; border-radius: 3px;
+    background: #ece4cf; color: #1f2a2c; font-size: 0.85rem; white-space: nowrap;
+    box-shadow: 0 2px 6px rgb(0 0 0 / 0.4);
   }
-  .bond .tag { color: #8fb3d9; }
-  .teaser { border-style: dashed; border-left-style: dashed; border-left-color: var(--line); background: transparent; }
-  .teaser p, .teaser .tag { color: var(--muted); }
+  .bond .plate { background: #d6e4f0; }
+  .teaser { background: transparent; border-style: dashed; box-shadow: none; }
+  .teaser p { color: var(--muted); }
+  .teaser .plate { background: var(--panel-2); color: var(--muted); }
 
   .quiet p { margin: 0; font-family: var(--font-title); font-style: italic; }
   .foot { margin: 0; }

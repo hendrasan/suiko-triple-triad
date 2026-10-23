@@ -6,7 +6,7 @@
   import { ABILITIES } from '../data/abilities';
   import { BONDS } from '../data/bonds';
   import type { CardDef } from '../core/types';
-  import { CARDS } from '../data/cards';
+  import { CARDS, starKind as kind } from '../data/cards';
   import { openRegions, save } from '../stores/save.svelte';
   import { SHAPES, UNITE_TEXT } from '../data/formations';
   import Card from './Card.svelte';
@@ -20,9 +20,6 @@
 
   const owned = $derived(new Set(save.owned));
   const regions = $derived(openRegions());
-  /** Heavenly / Earthly for Stars and extra cards; Jowy and Luca are story cards. */
-  const kind = (c: CardDef): 'heavenly' | 'earthly' | 'story' =>
-    c.starNo ? (c.starNo <= 36 ? 'heavenly' : 'earthly') : c.extraNo ? (c.rarity === 'common' ? 'earthly' : 'heavenly') : 'story';
   const list = $derived(
     CARDS.filter((c) => (filter === 'all' || kind(c) === filter) && matchesCard(c, query, owned.has(c.id))),
   );
@@ -71,7 +68,7 @@
       {/each}
       {#if hasRichmond}
         <div class="meter">
-          <div class="meter-label small"><span>🔍 Richmond's secrets</span><span>{secretsFound}/{secretsTotal}</span></div>
+          <div class="meter-label small"><span>🔍 Richmond's Investigations</span><span>{secretsFound}/{secretsTotal}</span></div>
           <div class="bar blue"><span style="width:{pct(secretsFound, secretsTotal)}%"></span></div>
         </div>
       {/if}
@@ -92,10 +89,17 @@
   <div class="grid rise" style="--i:2">
     {#each list as c (c.id)}
       {@const have = owned.has(c.id)}
-      <button class="cell" class:have data-sfx="open" onclick={() => show(c)} aria-label={have ? c.name : `Unknown Star ${c.starNo ?? c.extraNo ?? ''}`}>
+      {@const total = REPORTS[c.id].secrets.length}
+      {@const found = secretsOpen(total, wins(c.id), hasRichmond)}
+      <button class="cell" class:have data-sfx="open" onclick={() => show(c)}
+        aria-label={have ? `${c.name}${hasRichmond ? `, ${found} of ${total} investigations` : ''}` : `Unknown Star ${c.starNo ?? c.extraNo ?? ''}`}>
         <span class="no">{c.starNo ?? c.extraNo ?? '✦'}</span>
         {#if have}
           <Card id={c.id} showName />
+          <!-- One dot per secret: filled = found. Only after Richmond joins. -->
+          {#if hasRichmond}
+            <span class="pips" aria-hidden="true">{#each Array(total) as _, i}<span class:on={i < found}></span>{/each}</span>
+          {/if}
         {:else}
           {@render missingTile(c)}
           <div class="name">???</div>
@@ -151,7 +155,7 @@
           </div>
         {/if}
         <section class="report">
-          <h3>🔍 Richmond's Report</h3>
+          <h3>🔍 Richmond's Investigations</h3>
           {#if !hasRichmond}
             <p class="muted small">Recruit Richmond, the detective of South Window, and he will investigate your Stars.</p>
           {:else}
@@ -242,6 +246,9 @@
     background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 0 5px; color: var(--muted);
   }
   .have .no { color: var(--gold-2); border-color: #6d5420; }
+  .pips { display: flex; justify-content: center; gap: 3px; margin-top: 3px; }
+  .pips span { width: 5px; height: 5px; border-radius: 50%; box-shadow: inset 0 0 0 1px #6b7f95; }
+  .pips span.on { background: #8fb3d9; box-shadow: none; }
   .missing { width: 100%; aspect-ratio: 1; border-radius: 10px; background: #000; border: 2px solid #3d3227; }
   .name { margin-top: 4px; text-align: center; font-size: 0.75rem; font-weight: 600; color: rgb(255 255 255 / 0.25); }
 

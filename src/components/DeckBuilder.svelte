@@ -2,9 +2,9 @@
   import { OPPONENT_BY_ID } from '../data/opponents';
   import { go } from '../stores/nav.svelte';
   import { CONFIG } from '../core/config';
-  import { RUNES, type BoardSize, type Rarity, type Rune } from '../core/types';
+  import { RUNES, type BoardSize, type Rune } from '../core/types';
   import { BONDS } from '../data/bonds';
-  import { CARD_BY_ID } from '../data/cards';
+  import { CARD_BY_ID, starKind } from '../data/cards';
   import { SLOTS, defaultDeck } from '../stores/saveData';
   import { deckCost, deckProblem, persist, save } from '../stores/save.svelte';
   import { cap, matchesCard } from '../lib/text';
@@ -17,7 +17,7 @@
   // svelte-ignore state_referenced_locally
   let mode = $state<BoardSize>(initialMode ?? 3);
   let rune = $state<Rune | 'all'>('all');
-  let rarity = $state<Rarity | 'all'>('all');
+  let star = $state<'heavenly' | 'earthly' | 'all'>('all');
   let sort = $state<'power' | 'star' | 'name'>('power');
   let query = $state('');
 
@@ -31,7 +31,7 @@
   const pool = $derived(
     save.owned
       .map((id) => CARD_BY_ID[id])
-      .filter((c) => (rune === 'all' || c.rune === rune) && (rarity === 'all' || c.rarity === rarity) && matchesCard(c, query))
+      .filter((c) => (rune === 'all' || c.rune === rune) && (star === 'all' || starKind(c) === star) && matchesCard(c, query))
       .sort((a, b) =>
         sort === 'power' ? sum(b.id) - sum(a.id) : sort === 'name' ? a.name.localeCompare(b.name) : (a.starNo ?? 999) - (b.starNo ?? 999),
       ),
@@ -40,7 +40,10 @@
   const bonds = $derived(
     BONDS.map((b) => ({ b, have: b.members.filter((m) => deck.includes(m)) })).filter((x) => x.have.length >= 2),
   );
-  const partnerOfDeck = (id: string) => !deck.includes(id) && BONDS.some((b) => b.members.includes(id) && b.members.some((m) => m !== id && deck.includes(m)));
+  /** Names of the deck cards that this pool card has a bond with (empty when it is in the deck). */
+  const deckPartners = (id: string) =>
+    deck.includes(id) ? [] : [...new Set(BONDS.filter((b) => b.members.includes(id)).flatMap((b) => b.members.filter((m) => m !== id && deck.includes(m))))]
+      .map((m) => CARD_BY_ID[m].name);
   const runeCounts = $derived(RUNES.map((r) => [r, deck.filter((id) => CARD_BY_ID[id].rune === r).length] as const));
 
   function toggle(id: string) {
@@ -141,11 +144,8 @@
     <label class="small">Rune
       <select bind:value={rune}><option value="all">All</option>{#each RUNES as r}<option value={r}>{cap(r)}</option>{/each}</select>
     </label>
-    <label class="small">Rarity
-      <select bind:value={rarity}>
-        <option value="all">All</option><option value="common">Common</option><option value="rare">Rare</option>
-        <option value="special">Special</option><option value="boss">Boss</option>
-      </select>
+    <label class="small">Star
+      <select bind:value={star}><option value="all">All</option><option value="heavenly">Heavenly</option><option value="earthly">Earthly</option></select>
     </label>
     <label class="small">Sort
       <select bind:value={sort}><option value="power">Power</option><option value="star">Star no.</option><option value="name">Name</option></select>
@@ -155,9 +155,12 @@
   <div class="pool">
     {#each pool as c (c.id)}
       {@const inDeck = deck.includes(c.id)}
-      <button class="poolcard" class:in={inDeck} data-sfx={inDeck ? 'remove' : 'add'} onclick={() => toggle(c.id)} aria-pressed={inDeck} aria-label="{inDeck ? 'Remove' : 'Add'} {c.name}">
-        <Card id={c.id} showName bond={partnerOfDeck(c.id)} />
+      {@const partners = deckPartners(c.id)}
+      <button class="poolcard" class:in={inDeck} class:partner={partners.length > 0} data-sfx={inDeck ? 'remove' : 'add'} onclick={() => toggle(c.id)} aria-pressed={inDeck}
+        aria-label="{inDeck ? 'Remove' : 'Add'} {c.name}{partners.length ? `, bond with ${partners.join(', ')}` : ''}" title={partners.length ? `Bond with ${partners.join(', ')}` : undefined}>
+        <Card id={c.id} showName />
         <span class="cost">{CONFIG.costs[c.rarity]}</span>
+        {#if partners.length}<span class="bondtag" aria-hidden="true">⛓ Bond</span>{/if}
         {#if inDeck}<span class="check">✓</span>{/if}
       </button>
     {/each}
@@ -196,6 +199,13 @@
   .none { margin: 0; text-align: center; }
   .pool { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 10px; }
   .poolcard.in :global(.card) { opacity: 0.45; }
+  /* Bond partner of a deck card: gold ring + a tag on the top edge (the corners hold cost and rune). */
+  .poolcard.partner :global(.card) { box-shadow: 0 0 0 2px var(--gold-2), 0 0 12px rgb(243 217 142 / 0.45); }
+  .bondtag {
+    position: absolute; z-index: 1; top: -8px; left: 50%; transform: translateX(-50%); white-space: nowrap;
+    padding: 0 6px; border-radius: 6px; font-size: 0.65rem; font-weight: 600;
+    background: var(--gold-2); color: #2a1d0b;
+  }
   .cost {
     position: absolute; top: -4px; left: -4px; width: 20px; height: 20px; border-radius: 50%;
     display: grid; place-items: center; font-size: 0.7rem; font-weight: 800;

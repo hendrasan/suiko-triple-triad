@@ -164,3 +164,7 @@ export const CARDS: CardDef[] = [
 export const CARD_BY_ID: Record<string, CardDef> = Object.fromEntries(CARDS.map((c) => [c.id, c]));
 
 export const STAR_COUNT = STARS.length;
+
+/** Heavenly / Earthly for Stars and extra cards (flavor only); Jowy and Luca are story cards. */
+export const starKind = (c: CardDef): 'heavenly' | 'earthly' | 'story' =>
+  c.starNo ? (c.starNo <= 36 ? 'heavenly' : 'earthly') : c.extraNo ? (c.rarity === 'common' ? 'earthly' : 'heavenly') : 'story';

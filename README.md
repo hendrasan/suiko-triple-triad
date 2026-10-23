@@ -40,11 +40,11 @@ Card and opponent art is in `public/portraits/<file>.webp`. The default file nam
 - **Rune tiles**: matching rune +1 on all sides, other rune −1. Values stay in 1–10.
 - **Bonds**: a card that touches an allied bond partner gets +1 on **all** sides (one bonus at most). See assumption 1.
 - **Unite Attack**: when a formation (3–4 bonded cards in the bond's shape) is complete, the owner flips the adjacent enemy card with the lowest touching value. Once per duel per side. No chain. Shapes: **Line** (one straight row or column), **Group** (`connected` in data: all touching, any shape), **Square** (2×2). Player-facing text is in `src/data/formations.ts`.
-- **Abilities** (20 Earthly Stars, icon in the bottom-left corner of the card). A card with an ability has 2 fewer stat points (`abilityStatCost`).
-  - **Steadfast** (Hans, Gantetsu, Barbara, Maximillian, Gadget): Same, Plus, and Combo cannot flip it. Normal flips and Unite Attacks can.
+- **Abilities** (20 Earthly Stars and 3 extra cards, icon in the bottom-left corner of the card). A card with an ability has 2 fewer stat points (`abilityStatCost`).
+  - **Steadfast** (Hans, Gantetsu, Barbara, Maximillian, Gadget, Rulodia): Same, Plus, and Combo cannot flip it. Normal flips and Unite Attacks can.
   - **Rally** (Leona, Annallee, Connell, Huan, Apple): allied cards next to it get +1 on all sides (at most +1). The bonus follows the card's current owner.
-  - **Sabotage** (Hoi, Shilo, Sasuke, Koyu, Lo Wen): when placed, the adjacent enemy card with the highest facing value loses 1 on that side, before attacks. The −1 lasts all game, even if that card changes sides.
-  - **Rune-born** (Jeane, Mazus, Lorelai, Tomo, Tetsu): +2 on a matching rune tile, and no −1 on other runes.
+  - **Sabotage** (Hoi, Shilo, Sasuke, Koyu, Lo Wen, Kasumi): when placed, the adjacent enemy card with the highest facing value loses 1 on that side, before attacks. The −1 lasts all game, even if that card changes sides.
+  - **Rune-born** (Jeane, Mazus, Lorelai, Tomo, Tetsu, Chuchara): +2 on a matching rune tile, and no −1 on other runes.
 - **Sound**: ZzFX sound effects, generated in the browser (no audio files). On by default; toggle with 🔊 in a duel or in Settings.
 - **Music** (`public/music/`, both CC0 from OpenGameArt): battle music is [“Funked Up” by Joth](https://opengameart.org/content/funked-up) (the author asks for credit). Menu music is [“Etirwer” by Kistol](https://opengameart.org/content/etirwer) (OGG, plus an AAC copy for Safari). Toggle with 🎵 in a duel or in Settings.
 - **Parity**: casual 4×4 duels give +1 to one card of the first player (the second player gets the last move). Casual 3×3 duels have no handicap. Bosses play best of two: you must win both games (the first player switches). After a game 1 draw or loss, the match ends: a draw or a defeat.
@@ -77,12 +77,12 @@ Recruit Richmond (the detective, a quest recruit in South Window & Two River) to
 The 108 Stars list was checked against [Gensopedia: 108 Stars](https://gensopedia.org/w/108_Stars) and the [RPGSite recruitment guide](https://www.rpgsite.net/guide/16986-suikoden-ii-recruitment-guide-how-to-get-all-108-star-destiny-characters).
 
 - **Star 2 (Tengou):** Ridley is used. Boris Wizen can take this star in the game.
-- **Stars 12 and 25 (Tenman, Tentai):** two of Feather, Siegfried, and Abizboah. Feather and Abizboah are used.
-- **Stars 14 and 59 (Tensho, Chikyuu):** Valeria or Kasumi is a player choice. Valeria is used, and Tomo takes Star 59.
+- **Stars 12 and 25 (Tenman, Tentai):** two of Feather, Sigfried, and Abizboah. Feather and Abizboah are used. Sigfried is extra card 110.
+- **Stars 14 and 59 (Tensho, Chikyuu):** Valeria or Kasumi is a player choice. Valeria is used, and Tomo takes Star 59. Kasumi is extra card 109.
 - **Star names** use the Gensopedia romanization. Several names repeat (Tenyuu ×3, Chiyuu ×4, Chikou ×3). Please check the readings.
 - **Jowy and Luca Blight** are not among the 108. They are story cards.
 
-If you want Boris, Kasumi, or Siegfried as extra alternate cards, that makes 113 cards. Tell me and I will add them.
+Boris is not a card yet. He can be added later as an extra card.
 
 ## Phase 2 hooks (data only, not built)
 
